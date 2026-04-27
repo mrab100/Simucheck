@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="description" content="SimuCheck — Verify any phone before you buy. AI-powered. Made for Kenyans."/>
+<meta name="theme-color" content="#04080f"/>
+<title>SimuCheck — Don't Buy Blind</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#04080f;--surface:#090f1a;--surface2:#0d1420;--border:#1a2535;--border2:#253045;--blue:#2461e8;--blue-l:#4d82f5;--blue-glow:rgba(36,97,232,0.15);--green:#0ec974;--green-d:#09a05b;--red:#f03d3d;--amber:#f5a623;--text:#eef2f8;--text2:#7a90aa;--text3:#3a4f65;--fd:'Syne',sans-serif;--fb:'DM Sans',sans-serif}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100vh;overflow-x:hidden}
+.nav{position:sticky;top:0;z-index:100;background:rgba(4,8,15,0.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px;height:58px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;text-decoration:none}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,#2461e8,#1a4fc0);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 16px rgba(36,97,232,.4)}
+.logo-name{font-family:var(--fd);font-size:18px;font-weight:900;color:var(--text);letter-spacing:.04em}
+.logo-tag{font-size:9px;color:var(--blue-l);letter-spacing:.2em;text-transform:uppercase;margin-top:-2px}
+.btn{border:none;border-radius:8px;cursor:pointer;font-family:var(--fb);font-weight:600;transition:all .18s}
+.btn-primary{background:linear-gradient(135deg,#2461e8,#1a4fc0);color:#fff;padding:8px 18px;font-size:13px;font-weight:700;box-shadow:0 4px 14px rgba(36,97,232,.35)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(36,97,232,.45)}
+.page{display:none}.page.active{display:block}
+/* HERO */
+.hero{padding:52px 20px 40px;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border)}
+.hero::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:280px;background:radial-gradient(ellipse,rgba(36,97,232,.11) 0%,transparent 70%);pointer-events:none}
+.pill{display:inline-flex;align-items:center;gap:6px;background:rgba(36,97,232,.1);border:1px solid rgba(36,97,232,.25);border-radius:100px;padding:5px 14px;font-size:11px;color:var(--blue-l);letter-spacing:.12em;text-transform:uppercase;margin-bottom:20px}
+.hero h1{font-family:var(--fd);font-size:clamp(29px,8.5vw,52px);font-weight:900;line-height:1.07;letter-spacing:-.02em;margin-bottom:10px}
+.hero h1 .red{color:#f03d3d}
+.hero h1 .accent{background:linear-gradient(90deg,#4d82f5,#7aa8ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:clamp(14px,3.8vw,17px);color:var(--text2);max-width:400px;margin:0 auto 6px;line-height:1.65}
+.hero-free{font-size:13px;color:var(--green);margin-bottom:26px}
+.hero-cta{background:linear-gradient(135deg,#2461e8,#1a4fc0);border:none;border-radius:12px;padding:16px 36px;color:#fff;font-family:var(--fd);font-size:16px;font-weight:800;cursor:pointer;letter-spacing:.04em;box-shadow:0 8px 28px rgba(36,97,232,.38);transition:all .2s;display:inline-block}
+.hero-cta:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(36,97,232,.48)}
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border)}
+.stat{background:var(--bg);padding:20px 10px;text-align:center}
+.stat-n{font-family:var(--fd);font-size:clamp(15px,4.2vw,23px);font-weight:900;color:var(--blue-l)}
+.stat-l{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.4}
+/* SECTIONS */
+.sec{padding:38px 20px;border-bottom:1px solid var(--border)}
+.sec-inner{max-width:500px;margin:0 auto}
+.sec-tag{font-size:11px;color:var(--blue-l);letter-spacing:.18em;text-transform:uppercase;margin-bottom:8px}
+.sec-title{font-family:var(--fd);font-size:22px;font-weight:800;margin-bottom:6px}
+.sec-sub{font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
+.card-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.card-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.cnum{width:20px;height:20px;border-radius:50%;background:rgba(36,97,232,.12);border:1px solid rgba(36,97,232,.28);color:var(--blue-l);font-size:10px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;margin-right:5px}
+.chk{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 15px;margin-bottom:8px}
+.chk-icon{font-size:18px;flex-shrink:0}
+.chk-info{flex:1}
+.chk-name{font-size:13px;font-weight:600;color:var(--text)}
+.chk-desc{font-size:11px;color:var(--text3);margin-top:2px}
+.chk-w{font-size:11px;color:var(--text3);font-weight:700;flex-shrink:0}
+/* SELLER BADGE */
+.badge-box{background:linear-gradient(135deg,rgba(14,201,116,.07),rgba(9,160,91,.04));border:1px solid rgba(14,201,116,.25);border-radius:16px;padding:24px 20px;margin-bottom:10px}
+.badge-title{font-family:var(--fd);font-size:19px;font-weight:800;margin-bottom:8px}
+.badge-desc{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:14px}
+.badge-features{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.badge-feat{font-size:13px;color:var(--text2);display:flex;gap:8px;align-items:flex-start}
+.badge-feat::before{content:'✓';color:var(--green);flex-shrink:0;font-weight:700}
+.badge-cta{width:100%;background:linear-gradient(135deg,#0ec974,#09a05b);border:none;border-radius:10px;padding:13px;color:#fff;font-family:var(--fd);font-size:14px;font-weight:800;cursor:pointer;letter-spacing:.04em;box-shadow:0 4px 16px rgba(14,201,116,.3)}
+/* FORM */
+.form-wrap{max-width:500px;margin:0 auto;padding:24px 16px 50px}
+.back-btn{background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;padding:0;margin-bottom:16px;font-family:var(--fb)}
+.back-btn:hover{color:var(--text2)}
+.form-title{font-family:var(--fd);font-size:24px;font-weight:800;margin-bottom:4px}
+.form-sub{font-size:13px;color:var(--text2);margin-bottom:18px}
+.field{margin-bottom:16px}
+.field-label{display:block;font-size:11px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-bottom:7px}
+.field-label .req{color:var(--red)}
+.inp{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:13px 14px;color:var(--text);font-size:15px;font-family:var(--fb);outline:none;transition:border-color .18s;appearance:none;-webkit-appearance:none;box-sizing:border-box}
+.inp:focus{border-color:var(--blue)}
+.inp.valid{border-color:var(--green)}
+.inp.invalid{border-color:var(--red)}
+textarea.inp{resize:none}
+.price-row{display:flex;gap:8px}
+.photo-lbl{display:block;cursor:pointer;border:2px dashed var(--border2);border-radius:12px;padding:24px 16px;text-align:center;background:transparent;transition:border-color .2s,background .2s}
+.photo-lbl:hover{border-color:var(--blue);background:var(--blue-glow)}
+.photo-lbl.has-photo{border-color:var(--blue);background:var(--blue-glow);border-style:solid}
+.photo-lbl input[type=file]{display:none}
+.photo-prev{max-height:110px;max-width:100%;border-radius:8px;display:block;margin:0 auto 10px}
+.ib{border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13px;line-height:1.6}
+.ib-blue{background:rgba(36,97,232,.07);border:1px solid rgba(36,97,232,.2);color:#7aa8ff}
+.ib-green{background:rgba(14,201,116,.07);border:1px solid rgba(14,201,116,.22);color:#5dd9a0}
+.ib-red{background:rgba(240,61,61,.08);border:1px solid rgba(240,61,61,.25);color:#f09090}
+.ib-amber{background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.22);color:#d4a855}
+.sub-btn{width:100%;background:linear-gradient(135deg,#2461e8,#1a4fc0);border:none;border-radius:12px;padding:16px;color:#fff;font-family:var(--fd);font-size:16px;font-weight:800;cursor:pointer;letter-spacing:.04em;box-shadow:0 6px 22px rgba(36,97,232,.35);transition:all .2s;margin-top:6px}
+.sub-btn:hover{transform:translateY(-1px)}
+.form-note{text-align:center;font-size:11px;color:var(--text3);margin-top:10px}
+/* CHECKING */
+.chk-wrap{min-height:calc(100vh - 58px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px}
+.chk-anim-icon{width:64px;height:64px;background:rgba(36,97,232,.1);border:2px solid rgba(36,97,232,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:18px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(36,97,232,.3)}50%{box-shadow:0 0 0 12px rgba(36,97,232,0)}}
+.anim-steps{width:100%;max-width:380px;display:flex;flex-direction:column;gap:9px}
+.anim-step{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px;padding:13px 15px;transition:all .35s}
+.anim-step.done{background:rgba(14,201,116,.06);border-color:rgba(14,201,116,.2)}
+.anim-step.active{border-color:rgba(36,97,232,.3)}
+.anim-step-icon{font-size:15px}
+.anim-step-text{font-size:13px;color:var(--text3)}
+.anim-step.done .anim-step-text{color:#a0e8c8}
+.anim-step.active .anim-step-text{color:#fde68a}
+/* RESULT */
+.res-wrap{max-width:500px;margin:0 auto;padding:20px 16px 50px}
+.verdict-card{border-radius:16px;padding:28px 20px;text-align:center;margin-bottom:16px;border:2px solid}
+.v-tag{font-size:11px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:6px;opacity:.7}
+.v-emoji{font-size:46px;margin-bottom:6px}
+.v-name{font-family:var(--fd);font-size:clamp(28px,7vw,40px);font-weight:900}
+.v-score{font-family:var(--fd);font-size:52px;font-weight:900;line-height:1;margin:8px 0 4px}
+.v-score span{font-size:16px;color:var(--text3)}
+.v-headline{font-size:13px;color:var(--text2);line-height:1.55;margin-top:10px;max-width:320px;margin-left:auto;margin-right:auto}
+.v-conf{display:inline-block;margin-top:10px;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700}
+.bk-label{font-size:11px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-bottom:9px;margin-top:6px}
+.bk-row{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 15px;margin-bottom:8px}
+.bk-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.bk-name{font-size:12px;font-weight:700;color:#d1d5db}
+.bk-pass{font-size:12px;font-weight:800}
+.pass{color:var(--green)}.fail{color:var(--red)}.na{color:var(--text3)}
+.bk-detail{font-size:12px;color:var(--text3);line-height:1.55}
+.bk-range{font-size:12px;color:var(--blue-l);margin-top:4px}
+.flags-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.flag-box{border-radius:10px;padding:13px}
+.flag-box.red{background:rgba(240,61,61,.06);border:1px solid rgba(240,61,61,.2)}
+.flag-box.green{background:rgba(14,201,116,.06);border:1px solid rgba(14,201,116,.2)}
+.flag-title{font-size:11px;font-weight:800;margin-bottom:7px}
+.flag-box.red .flag-title{color:var(--red)}
+.flag-box.green .flag-title{color:var(--green)}
+.flag-item{font-size:12px;margin-bottom:5px;line-height:1.4}
+.flag-box.red .flag-item{color:#f09090}
+.flag-box.green .flag-item{color:#6ee7b7}
+.adv-box{border-radius:12px;padding:16px 18px;margin-bottom:12px}
+.adv-title{font-size:11px;font-weight:800;margin-bottom:8px;letter-spacing:.08em}
+.adv-text{font-size:14px;color:#d1d5db;line-height:1.7}
+.res-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.btn-out{background:transparent;border:1px solid var(--border);border-radius:10px;padding:13px;color:var(--text2);font-size:13px;cursor:pointer;font-weight:700;font-family:var(--fb)}
+.footer{border-top:1px solid var(--border);padding:18px 20px;text-align:center;font-size:11px;color:var(--text3)}
+@media(max-width:360px){.grid2{grid-template-columns:1fr}.flags-grid{grid-template-columns:1fr}.res-actions{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="logo" onclick="showPage('home')" href="#">
+    <div class="logo-icon">🛡️</div>
+    <div><div class="logo-name">SimuCheck</div><div class="logo-tag">Made for Kenyans</div></div>
+  </a>
+  <div style="display:flex;gap:8px;align-items:center">
+    <span style="font-size:11px;background:rgba(14,201,116,.1);border:1px solid rgba(14,201,116,.28);color:#0ec974;border-radius:6px;padding:3px 8px;white-space:nowrap">Free to Use</span>
+    <button class="btn btn-primary" onclick="showPage('checker')">Verify Phone</button>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="pill">🇰🇪 Made for Kenyans, by Kenyans</div>
+    <h1>Don't Lose <span class="red">KES 20,000</span><br/>Because You Skipped<br/>a <span class="accent">Free Check</span></h1>
+    <p class="hero-sub">Fake phones are everywhere in Kenya. Verify any phone in 30 seconds before you pay — and buy with total confidence.</p>
+    <p class="hero-free">✓ Completely free — no sign-up, no payment needed</p>
+    <button class="hero-cta" onclick="showPage('checker')">🔍 Check My Phone Now — Free</button>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-n">3 in 5</div><div class="stat-l">Kenyans unknowingly own a fake phone</div></div>
+    <div class="stat"><div class="stat-n">KES 15B+</div><div class="stat-l">Lost to fake phones in Kenya every year</div></div>
+    <div class="stat"><div class="stat-n">30 sec</div><div class="stat-l">To verify any phone with SimuCheck</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-inner">
+      <p class="sec-tag">The Problem</p>
+      <h2 class="sec-title">Someone Is Being Scammed Right Now</h2>
+      <p class="sec-sub">Across Kenya every day, people save for months then lose it all to a fake phone. The packaging looks real. The seller is convincing. By the time you find out, your money is gone.</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--text2)"><span style="color:var(--red);flex-shrink:0">✗</span>Phone model names that are completely invented</div>
+        <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--text2)"><span style="color:var(--red);flex-shrink:0">✗</span>Prices that sound like deals but are really scams</div>
+        <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--text2)"><span style="color:var(--red);flex-shrink:0">✗</span>IMEI numbers that fail basic validity checks</div>
+        <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--text2)"><span style="color:var(--red);flex-shrink:0">✗</span>Fake logos and wrong ports on clone phones</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-inner">
+      <p class="sec-tag">How It Works</p>
+      <h2 class="sec-title">4 Steps to Know the Truth</h2>
+      <div class="grid2">
+        <div class="card"><div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><span class="cnum">1</span><span style="font-size:16px">📱</span></div><div class="card-title">Dial *#06#</div><div class="card-desc">Get the IMEI yourself — never let the seller dial it for you</div></div>
+        <div class="card"><div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><span class="cnum">2</span><span style="font-size:16px">📋</span></div><div class="card-title">Enter Details</div><div class="card-desc">Brand, model, price, and upload a photo if possible</div></div>
+        <div class="card"><div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><span class="cnum">3</span><span style="font-size:16px">🤖</span></div><div class="card-title">AI Checks</div><div class="card-desc">8 checks run instantly — IMEI, brand, price, model, visual</div></div>
+        <div class="card"><div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><span class="cnum">4</span><span style="font-size:16px">📄</span></div><div class="card-title">Get Your Result</div><div class="card-desc">Clear verdict with full breakdown and honest advice</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-inner">
+      <p class="sec-tag">The Verification Engine</p>
+      <h2 class="sec-title">8 Independent Checks</h2>
+      <p class="sec-sub">Every verification runs all of these at the same time</p>
+      <div class="chk"><span class="chk-icon">🔢</span><div class="chk-info"><div class="chk-name">IMEI Luhn Algorithm</div><div class="chk-desc">Mathematical formula every genuine phone must pass</div></div><div class="chk-w">20%</div></div>
+      <div class="chk"><span class="chk-icon">🏷️</span><div class="chk-info"><div class="chk-name">TAC Brand Match</div><div class="chk-desc">First 8 digits of IMEI identify the manufacturer</div></div><div class="chk-w">20%</div></div>
+      <div class="chk"><span class="chk-icon">📱</span><div class="chk-info"><div class="chk-name">Model Existence Check</div><div class="chk-desc">Does this model actually exist from this brand?</div></div><div class="chk-w">15%</div></div>
+      <div class="chk"><span class="chk-icon">💰</span><div class="chk-info"><div class="chk-name">Kenya Market Price</div><div class="chk-desc">Is the price realistic for a genuine device in Kenya?</div></div><div class="chk-w">15%</div></div>
+      <div class="chk"><span class="chk-icon">👁️</span><div class="chk-info"><div class="chk-name">AI Visual Inspection</div><div class="chk-desc">Photo analysis — logos, ports, build quality, bezels</div></div><div class="chk-w">15%</div></div>
+      <div class="chk"><span class="chk-icon">🔍</span><div class="chk-info"><div class="chk-name">IMEI Pattern Analysis</div><div class="chk-desc">Detects repeated digits, all zeros, known fake patterns</div></div><div class="chk-w">10%</div></div>
+      <div class="chk"><span class="chk-icon">📦</span><div class="chk-info"><div class="chk-name">Box &amp; IMEI Consistency</div><div class="chk-desc">Does the box sticker match the phone IMEI?</div></div><div class="chk-w">3%</div></div>
+      <div class="chk"><span class="chk-icon">🌍</span><div class="chk-info"><div class="chk-name">Kenya Counterfeit Context</div><div class="chk-desc">Is this model commonly faked in the Kenyan market?</div></div><div class="chk-w">2%</div></div>
+    </div>
+  </div>
+
+  <!-- TRUSTED SELLER BADGE -->
+  <div class="sec">
+    <div class="sec-inner">
+      <p class="sec-tag">For Phone Sellers &amp; Shops</p>
+      <h2 class="sec-title">Become a Trusted Seller</h2>
+      <p class="sec-sub">Customers are scared of fake phones. Give them one strong reason to choose your shop over everyone else on the street.</p>
+      <div class="badge-box">
+        <div style="font-size:36px;margin-bottom:10px">🏅</div>
+        <div class="badge-title">SimuCheck Trusted Seller Badge</div>
+        <div class="badge-desc">Display our official badge in your shop, on your WhatsApp, and on your social media. It tells every customer: <strong style="color:var(--text)">"This seller verifies phones before selling. You are safe here."</strong><br/><br/>Customers who know about SimuCheck will walk past other shops to come to you.</div>
+        <div class="badge-features">
+          <div class="badge-feat">Official Trusted Seller badge for your shop window</div>
+          <div class="badge-feat">Unlimited phone verifications every month</div>
+          <div class="badge-feat">Business verification dashboard</div>
+          <div class="badge-feat">Certificate to show customers on request</div>
+          <div class="badge-feat">Listed in SimuCheck Verified Sellers directory (coming soon)</div>
+          <div class="badge-feat">Pay via M-Pesa — KES 499/month or KES 999/month unlimited</div>
+        </div>
+        <button class="badge-cta" onclick="showSellerInterest()">🏅 I Want the Trusted Seller Badge</button>
+        <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:8px">Launching soon · Be among the first verified sellers in Kenya</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISCLAIMER -->
+  <div style="padding:0 20px 10px">
+    <div style="background:rgba(245,166,35,.05);border:1px solid rgba(245,166,35,.18);border-radius:12px;padding:16px 18px">
+      <div style="font-size:12px;color:var(--amber);font-weight:700;margin-bottom:6px">ℹ️ ABOUT OUR RESULTS</div>
+      <p style="font-size:13px;color:#c8a870;line-height:1.65">SimuCheck uses AI analysis. Our results are <strong>advisory</strong> — honest, accurate, and catch most fake phones clearly. For a final official verdict, visit the brand's authorised service centre with the phone in hand.</p>
+    </div>
+  </div>
+
+  <div style="padding:44px 20px 50px;text-align:center">
+    <h2 style="font-family:var(--fd);font-size:clamp(20px,5vw,26px);font-weight:800;margin-bottom:8px;line-height:1.2">Someone Is Getting Scammed<br/>Right Now. Don't Be Next.</h2>
+    <p style="font-size:14px;color:var(--text2);margin:0 auto 22px;max-width:340px;line-height:1.6">Free. 30 seconds. Could save your savings.</p>
+    <button class="hero-cta" onclick="showPage('checker')">🛡️ Verify My Phone Now — Free</button>
+  </div>
+  <div class="footer">SimuCheck · Made for Kenyans, by Kenyans 🇰🇪 · AI-powered advisory results</div>
+</div>
+
+<!-- CHECKER -->
+<div class="page" id="page-checker">
+  <div class="form-wrap">
+    <button class="back-btn" onclick="showPage('home')">← Back</button>
+    <div class="ib ib-green">🎁 SimuCheck is completely free — verify as many phones as you need</div>
+    <h2 class="form-title">Verify Your Phone</h2>
+    <p class="form-sub">More details = more accurate result.</p>
+    <div id="errorBox" class="ib ib-red" style="display:none"></div>
+    <div class="ib ib-blue">📱 <strong>Get IMEI:</strong> Dial <strong style="color:var(--text)">*#06#</strong> on the phone yourself right now. Never let the seller do it.</div>
+
+    <div class="field">
+      <label class="field-label">Brand <span class="req">*</span></label>
+      <select id="brand" class="inp">
+        <option value="">Select brand...</option>
+        <option>Samsung</option><option>iPhone (Apple)</option><option>Tecno</option>
+        <option>Infinix</option><option>Itel</option><option>Atel</option>
+        <option>Xiaomi</option>
+        <option>Redmi</option><option>POCO</option><option>Huawei</option>
+        <option>Honor</option><option>Oppo</option><option>Vivo</option>
+        <option>Realme</option><option>OnePlus</option><option>Google Pixel</option>
+        <option>Nokia</option><option>Motorola</option><option>Sony</option>
+        <option>ZTE</option><option>Benco</option><option>Gionee</option>
+        <option>Oukitel</option><option>Cubot</option><option>Doogee</option>
+        <option>Umidigi</option><option>Blackview</option><option>Wiko</option>
+        <option>HTC</option><option>Other</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Exact Model Name <span class="req">*</span></label>
+      <input type="text" id="model" class="inp" placeholder="e.g. Samsung Galaxy A17, Benco S1 Plus, iPhone 15 Pro..."/>
+    </div>
+
+    <div class="field">
+      <label class="field-label">IMEI Number <span class="req">*</span> <span id="imeiHint" style="font-size:11px;color:var(--text3);text-transform:none;letter-spacing:0;font-weight:400">— 15 digits from *#06#</span></label>
+      <input type="text" id="imei" class="inp" inputmode="numeric" maxlength="15" placeholder="15-digit IMEI number" oninput="onImeiInput(this)" style="font-family:monospace;letter-spacing:.08em"/>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Purchase Price <span style="font-size:11px;color:var(--text3);text-transform:none;letter-spacing:0;font-weight:400">(helps detect price scams)</span></label>
+      <div class="price-row">
+        <select id="currency" class="inp" style="flex:0 0 88px"><option>KES</option><option>USD</option></select>
+        <input type="number" id="price" class="inp" placeholder="e.g. 22000" style="flex:1"/>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Anything Look Off? <span style="font-size:11px;color:var(--text3);text-transform:none;letter-spacing:0;font-weight:400">(optional)</span></label>
+      <textarea id="notes" class="inp" rows="2" placeholder="e.g. Logo looks slightly different, seller is rushing me..."></textarea>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Phone Photo <span style="color:var(--green);text-transform:none;letter-spacing:0;font-weight:400;font-size:11px">(strongly recommended)</span></div>
+      <label class="photo-lbl" id="photoLabel">
+        <input type="file" accept="image/*" id="photoInput" onchange="onPhoto(this)"/>
+        <div id="photoEmpty">
+          <div style="font-size:36px;margin-bottom:10px">📷</div>
+          <div style="font-size:14px;font-weight:600;color:var(--text2)">Tap to take or upload a photo</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:5px;line-height:1.5">AI checks logo accuracy, ports, build quality, bezels</div>
+        </div>
+        <div id="photoFilled" style="display:none">
+          <img id="photoPreview" class="photo-prev" src="" alt=""/>
+          <div style="font-size:12px;color:var(--green)">✓ Photo added — AI will analyse it</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:3px">Tap to change</div>
+        </div>
+      </label>
+    </div>
+
+    <button class="sub-btn" onclick="startVerification()">🛡️ Run Verification Now</button>
+    <div class="form-note">Your data is private and never stored</div>
+  </div>
+</div>
+
+<!-- CHECKING -->
+<div class="page" id="page-checking">
+  <div class="chk-wrap">
+    <div class="chk-anim-icon">🔍</div>
+    <div style="font-family:var(--fd);font-size:21px;font-weight:800;margin-bottom:6px">Verifying Your Phone</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:32px">Running all checks — please wait</div>
+    <div class="anim-steps">
+      <div class="anim-step" id="step0"><span class="anim-step-icon">⬜</span><span class="anim-step-text">Validating IMEI number...</span></div>
+      <div class="anim-step" id="step1"><span class="anim-step-icon">⬜</span><span class="anim-step-text">Checking brand database...</span></div>
+      <div class="anim-step" id="step2"><span class="anim-step-icon">⬜</span><span class="anim-step-text">Analysing Kenya market price...</span></div>
+      <div class="anim-step" id="step3"><span class="anim-step-icon">⬜</span><span class="anim-step-text">Running AI deep analysis...</span></div>
+      <div class="anim-step" id="step4"><span class="anim-step-icon">⬜</span><span class="anim-step-text">Preparing your result...</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="page" id="page-result">
+  <div class="res-wrap" id="resultContent"></div>
+</div>
+
+<script>
+let imgB64=null,imgMime='image/jpeg';
+function showPage(n){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+n).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});if(n==='checker')document.getElementById('errorBox').style.display='none';}
+function luhn(n){if(!/^\d{15}$/.test(n))return false;let s=0;for(let i=0;i<15;i++){let d=parseInt(n[i]);if(i%2===1){d*=2;if(d>9)d-=9;}s+=d;}return s%10===0;}
+function onImeiInput(el){el.value=el.value.replace(/\D/g,'');const v=el.value,h=document.getElementById('imeiHint');el.className='inp';if(v.length===15){if(luhn(v)){el.classList.add('valid');h.textContent='— ✓ Valid format';h.style.color='var(--green)';}else{el.classList.add('invalid');h.textContent='— ✗ Invalid — red flag';h.style.color='var(--red)';}}else{h.textContent=`— ${v.length}/15 digits`;h.style.color='var(--text3)';}}
+function onPhoto(input){const file=input.files&&input.files[0];if(!file)return;imgMime=file.type||'image/jpeg';document.getElementById('photoPreview').src=URL.createObjectURL(file);document.getElementById('photoEmpty').style.display='none';document.getElementById('photoFilled').style.display='block';document.getElementById('photoLabel').classList.add('has-photo');const r=new FileReader();r.onloadend=()=>{const p=r.result&&r.result.split(',');imgB64=p&&p[1]?p[1]:null;};r.readAsDataURL(file);}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+async function runAnim(){for(let i=0;i<5;i++){const el=document.getElementById('step'+i);document.querySelectorAll('.anim-step').forEach(s=>s.classList.remove('active'));el.classList.add('active');el.querySelector('.anim-step-icon').textContent='⏳';el.querySelector('.anim-step-text').style.color='#fde68a';await sleep(820);el.classList.remove('active');el.classList.add('done');el.querySelector('.anim-step-icon').textContent='✅';}}
+async function startVerification(){
+  const brand=document.getElementById('brand').value.trim();
+  const model=document.getElementById('model').value.trim();
+  const imei=document.getElementById('imei').value.trim();
+  const price=document.getElementById('price').value.trim();
+  const currency=document.getElementById('currency').value;
+  const notes=document.getElementById('notes').value.trim();
+  if(!brand||!model||!imei){const eb=document.getElementById('errorBox');eb.textContent='⚠️ Please fill in Brand, Model and IMEI to continue.';eb.style.display='block';return;}
+  showPage('checking');
+  for(let i=0;i<5;i++){const el=document.getElementById('step'+i);el.className='anim-step';el.querySelector('.anim-step-icon').textContent='⬜';el.querySelector('.anim-step-text').style.color='';}
+  const imeiOk=luhn(imei);
+  const animP=runAnim();
+  const content=[];
+  if(imgB64)content.push({type:'image',source:{type:'base64',media_type:imgMime,data:imgB64}});
+  content.push({type:'text',text:`You are SimuCheck, Kenya's most trusted phone verification AI with expert knowledge of all smartphones sold in Kenya.
+
+PHONE SUBMITTED:
+Brand: ${brand}
+Model: ${model}
+IMEI: ${imei}
+IMEI Luhn check: ${imeiOk?'PASSED ✓':'FAILED ✗ — strong indicator of fake'}
+TAC code (first 8 digits): ${imei.substring(0,8)}
+Price: ${price?price+' '+currency:'Not provided'}
+Notes: ${notes||'None'}
+Photo: ${imgB64?'YES — analyse it carefully':'No'}
+
+ACCURACY RULES:
+1. Samsung Galaxy A17 (2024) IS a real phone — do NOT flag as non-existent
+2. Benco is a real brand (Vmobile) — S1, S1 Plus, V60, Y40, Y80 are all real
+3. Honor is real (spun off Huawei 2020) — all Honor phones are legitimate
+4. ZTE is a real brand with Kenyan presence
+5. Tecno, Infinix, Itel are all legitimate (Transsion Holdings)
+6. Only flag a model as non-existent if you are CERTAIN
+7. TAC: Samsung mostly 35xxxxxx, Apple mostly 01xxxxxx or 35xxxxxx — if uncertain, say so honestly
+
+SCORING: Start 85. Luhn FAIL -35. Model does not exist -50 (cap at 20). TAC clearly wrong brand -30. Price 50%+ below genuine -18. Visual clear fake -20. Strong positives +up to 15.
+GENUINE=75+, SUSPICIOUS=45-74, FAKE=below 45
+
+Respond ONLY in this exact JSON, no markdown, no backticks:
+{"score":<0-100>,"verdict":"<GENUINE|SUSPICIOUS|FAKE>","headline":"<one honest plain-English sentence>","confidence":"<HIGH|MEDIUM|LOW>","imei_result":{"passed":<true|false>,"detail":"<2 sentences>"},"tac_result":{"passed":<true|false|null>,"detail":"<2 sentences, honest if uncertain>"},"model_result":{"exists":<true|false>,"detail":"<2 sentences>"},"price_result":{"realistic":<true|false|null>,"genuine_range_kes":"<e.g. KES 18,000–24,000>","detail":"<2 sentences>"},"visual_result":{"detail":"<2 sentences — photo findings or advise to upload next time>"},"red_flags":["<specific red flags only>"],"green_flags":["<positive signals>"],"advice":"<3-4 sentences direct honest advice to this buyer>","service_centre":"<Which brand service centre to visit in Kenya for official confirmation — include known Nairobi location if possible>","certificate_note":"<One sentence about using this if there is a dispute>"}`});
+  let parsed=null;
+  try{
+    const resp=await fetch('/api/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1200,system:"You are SimuCheck — Kenya's phone authentication AI. Be accurate and honest. Never falsely flag a genuine phone. Respond ONLY with pure JSON — no markdown, no backticks, nothing outside the JSON.",messages:[{role:'user',content}]})});
+    if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e?.error?.message||`Error ${resp.status} — please try again.`);}
+    const data=await resp.json();
+    if(data.error)throw new Error(data.error.message||'AI returned an error.');
+    const tb=data.content&&data.content.find(b=>b.type==='text');
+    if(!tb||!tb.text)throw new Error('No response received. Please try again.');
+    parsed=JSON.parse(tb.text.replace(/```json\s*/gi,'').replace(/```\s*/gi,'').trim());
+  }catch(err){
+    await animP;showPage('checker');
+    const eb=document.getElementById('errorBox');
+    eb.textContent='⚠️ '+(err.message||'Verification failed. Check your connection and try again.');
+    eb.style.display='block';return;
+  }
+  await animP;
+  renderResult(parsed);
+  showPage('result');
+}
+function passHtml(v){if(v===true)return '<span class="bk-pass pass">PASS ✓</span>';if(v===false)return '<span class="bk-pass fail">FAIL ✗</span>';return '<span class="bk-pass na">N/A</span>';}
+function renderResult(r){
+  const score=r.score||0;
+  let color,bg,border,label,emoji;
+  if(score>=75){color='#0ec974';bg='rgba(14,201,116,.07)';border='rgba(14,201,116,.28)';label='GENUINE';emoji='✅';}
+  else if(score>=45){color='#f5a623';bg='rgba(245,166,35,.07)';border='rgba(245,166,35,.28)';label='SUSPICIOUS';emoji='⚠️';}
+  else{color='#f03d3d';bg='rgba(240,61,61,.07)';border='rgba(240,61,61,.28)';label='LIKELY FAKE';emoji='🚫';}
+  const fh=()=>{const reds=r.red_flags||[],greens=r.green_flags||[];if(!reds.length&&!greens.length)return '';let h='<div class="flags-grid">';if(reds.length){h+='<div class="flag-box red"><div class="flag-title">🚩 RED FLAGS</div>';reds.forEach(f=>{h+=`<div class="flag-item">• ${f}</div>`;});h+='</div>';}if(greens.length){h+='<div class="flag-box green"><div class="flag-title">✅ GOOD SIGNS</div>';greens.forEach(f=>{h+=`<div class="flag-item">• ${f}</div>`;});h+='</div>';}h+='</div>';return h;};
+  document.getElementById('resultContent').innerHTML=`
+    <div class="verdict-card" style="background:${bg};border-color:${border};box-shadow:0 0 40px ${color}12">
+      <div class="v-tag" style="color:${color}">SimuCheck Verification</div>
+      <div class="v-emoji">${emoji}</div>
+      <div class="v-name">${label}</div>
+      <div class="v-score" style="color:${color}">${score}<span>/100</span></div>
+      <div class="v-headline">${r.headline||''}</div>
+      <div class="v-conf" style="background:${color}18;border:1px solid ${border};color:${color}">AI Confidence: ${r.confidence||'MEDIUM'}</div>
+    </div>
+    <div class="bk-label">Check Results</div>
+    ${r.imei_result?`<div class="bk-row"><div class="bk-hdr"><span class="bk-name">IMEI Validation</span>${passHtml(r.imei_result.passed)}</div><div class="bk-detail">${r.imei_result.detail||''}</div></div>`:''}
+    ${r.tac_result?`<div class="bk-row"><div class="bk-hdr"><span class="bk-name">Brand / TAC Match</span>${passHtml(r.tac_result.passed)}</div><div class="bk-detail">${r.tac_result.detail||''}</div></div>`:''}
+    ${r.model_result?`<div class="bk-row"><div class="bk-hdr"><span class="bk-name">Model Verification</span>${passHtml(r.model_result.exists)}</div><div class="bk-detail">${r.model_result.detail||''}</div></div>`:''}
+    ${r.price_result?`<div class="bk-row"><div class="bk-hdr"><span class="bk-name">Price Reality Check</span>${passHtml(r.price_result.realistic)}</div><div class="bk-detail">${r.price_result.detail||''}</div>${r.price_result.genuine_range_kes?`<div class="bk-range">Genuine Kenya price: <strong>${r.price_result.genuine_range_kes}</strong></div>`:''}</div>`:''}
+    ${r.visual_result?`<div class="bk-row"><div class="bk-hdr"><span class="bk-name">👁️ Visual Inspection</span></div><div class="bk-detail">${r.visual_result.detail||''}</div></div>`:''}
+    ${fh()}
+    <div class="adv-box" style="background:${bg};border:1px solid ${border}">
+      <div class="adv-title" style="color:${color}">💡 OUR ADVICE TO YOU</div>
+      <div class="adv-text">${r.advice||''}</div>
+    </div>
+    ${r.service_centre?`<div class="adv-box" style="background:rgba(36,97,232,.06);border:1px solid rgba(36,97,232,.2)"><div class="adv-title" style="color:var(--blue-l)">📍 FOR OFFICIAL CONFIRMATION</div><div class="adv-text" style="font-size:13px;color:#93c5fd">${r.service_centre}</div></div>`:''}
+    <div class="ib ib-amber" style="margin-bottom:14px;font-size:12px">ℹ️ SimuCheck uses AI analysis. Our result is advisory. For an official verdict, visit the brand's authorised service centre with the phone in hand.</div>
+    ${r.certificate_note?`<div class="bk-row" style="text-align:center;font-size:12px;color:var(--text3);font-style:italic;margin-bottom:12px">📄 ${r.certificate_note}</div>`:''}
+    <div class="res-actions">
+      <button class="btn-out" onclick="showPage('home')">← Home</button>
+      <button class="btn btn-primary" onclick="resetChecker()">Check Another →</button>
+    </div>
+    <div class="footer" style="border-top:none;padding-top:16px">SimuCheck · Made for Kenyans, by Kenyans 🇰🇪</div>`;
+}
+function resetChecker(){['brand','model','imei','price','notes'].forEach(id=>{document.getElementById(id).value='';});document.getElementById('imei').className='inp';document.getElementById('imeiHint').textContent='— 15 digits from *#06#';document.getElementById('imeiHint').style.color='';document.getElementById('photoInput').value='';document.getElementById('photoEmpty').style.display='block';document.getElementById('photoFilled').style.display='none';document.getElementById('photoLabel').classList.remove('has-photo');document.getElementById('photoPreview').src='';imgB64=null;showPage('checker');}
+function showSellerInterest(){alert('Thank you for your interest! 🏅\n\nThe Trusted Seller programme is launching soon.\n\nTo be among the first verified sellers in Kenya, send your shop name and location to:\ninfo@simucheck.co.ke\n\nWe will contact you directly.');}
+</script>
+</body>
+</html>
