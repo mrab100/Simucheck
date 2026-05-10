@@ -1,203 +1,162 @@
-// ═══════════════════════════════════════════════════════════════════════════
-// SimuCheck AI Agent — 3-step verification
-// Step 1: Google search for model existence, official specs, Kenya price
-// Step 2: Visual photo analysis
-// Step 3: Final verdict combining everything
-// ═══════════════════════════════════════════════════════════════════════════
+// SimuCheck — Netlify Function
+// Single reliable AI call with all Kenya knowledge built in
 
-async function callClaude(body) {
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": process.env.ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify(body),
+const https = require("https");
+
+// Use built-in https to avoid fetch compatibility issues on older Node
+function httpsPost(options, body) {
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, (res) => {
+      let data = "";
+      res.on("data", (chunk) => { data += chunk; });
+      res.on("end", () => {
+        try { resolve({ status: res.statusCode, body: JSON.parse(data) }); }
+        catch (e) { reject(new Error("Invalid JSON response from API")); }
+      });
+    });
+    req.on("error", reject);
+    req.setTimeout(25000, () => { req.destroy(); reject(new Error("Request timed out")); });
+    req.write(body);
+    req.end();
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err?.error?.message || `API error ${res.status}`);
-  }
-  return res.json();
 }
 
-// ── STEP 1: Research agent — searches Google for model + specs + Kenya price ─
-async function researchPhone(brand, model, price, currency) {
+exports.handler = async function (event) {
+  // Handle CORS preflight
+  if (event.httpMethod === "OPTIONS") {
+    return {
+      statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+      },
+      body: "",
+    };
+  }
+
+  if (event.httpMethod !== "POST") {
+    return { statusCode: 405, body: "Method Not Allowed" };
+  }
+
   try {
-    const data = await callClaude({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 800,
-      tools: [{ type: "web_search_20250305", name: "web_search" }],
-      system: "You are a phone research agent for SimuCheck Kenya. Search Google and find accurate information. Respond only with pure JSON — no markdown, no backticks, nothing outside the JSON object.",
-      messages: [{
-        role: "user",
-        content: `Search Google and find accurate information about the "${brand} ${model}".
+    const payload = JSON.parse(event.body);
+    const { brand, model, imei, imeiOk, price, currency, notes, imgB64, imgMime } = payload;
 
-Search for:
-1. Does this phone officially exist from ${brand}? When released?
-2. Official specs: RAM, storage, battery, camera, display, chipset
-3. Current retail price in Kenya (KES) from Jumia Kenya, Phone Place Kenya, Kilimall, or Safaricom Shop
-4. Is this model commonly counterfeited or cloned in Kenya?
+    if (!brand || !model || !imei) {
+      return {
+        statusCode: 400,
+        headers: { "Access-Control-Allow-Origin": "*" },
+        body: JSON.stringify({ error: { message: "Brand, model and IMEI are required." } }),
+      };
+    }
 
-Buyer claims price: ${price ? price + " " + currency : "not provided"}
+    // Build the message content
+    const userContent = [];
 
-Respond ONLY with this exact JSON:
-{
-  "model_exists": true,
-  "release_year": "2024",
-  "official_specs": {
-    "ram_options": ["4GB", "6GB"],
-    "storage_options": ["128GB", "256GB"],
-    "battery": "5000mAh",
-    "main_camera": "50MP",
-    "display": "6.88 inch HD+",
-    "chipset": "MediaTek Helio G81"
-  },
-  "kenya_price_min": 12000,
-  "kenya_price_max": 16000,
-  "price_source": "Jumia Kenya",
-  "commonly_faked": false,
-  "fake_notes": "",
-  "search_confidence": "HIGH"
-}`
-      }]
-    });
+    // Add photo if provided
+    if (imgB64) {
+      userContent.push({
+        type: "image",
+        source: {
+          type: "base64",
+          media_type: imgMime || "image/jpeg",
+          data: imgB64,
+        },
+      });
+    }
 
-    const textBlock = data.content && data.content.find(b => b.type === "text");
-    if (!textBlock || !textBlock.text) return null;
-    const cleaned = textBlock.text.replace(/```json\s*/gi, "").replace(/```\s*/gi, "").trim();
-    return JSON.parse(cleaned);
-  } catch (e) {
-    console.error("Research step error:", e.message);
-    return null;
-  }
-}
+    const tac = imei.substring(0, 8);
 
-// ── STEP 2: Visual analysis — analyses uploaded phone photo ─────────────────
-async function analysePhoto(imgB64, imgMime, brand, model) {
-  if (!imgB64) return null;
-  try {
-    const data = await callClaude({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 500,
-      system: "You are a phone authentication expert specialising in visual fake detection for the Kenyan market. Respond only with pure JSON.",
-      messages: [{
-        role: "user",
-        content: [
-          { type: "image", source: { type: "base64", media_type: imgMime || "image/jpeg", data: imgB64 } },
-          {
-            type: "text",
-            text: `Carefully analyse this photo for ${brand} ${model} authenticity.
+    userContent.push({
+      type: "text",
+      text: `You are SimuCheck, Kenya's most accurate phone verification AI.
 
-Check:
-1. Brand logo — font, spacing, colour, position correct for ${brand}?
-2. Box/packaging — print quality sharp or blurry? Genuine design?
-3. Spec labels — do specs on box match official ${brand} ${model}?
-4. Build quality — genuine materials or cheap clone feel?
-5. Any clone brand names visible? (U-FM, Shenzhen brands, generic Chinese brands)
-6. Camera module — correct shape and layout for this model?
-7. Any sticker cover-ups or rebranding attempts?
-
-Respond ONLY with this JSON:
-{
-  "visual_score": 85,
-  "looks_genuine": true,
-  "findings": "2-3 sentences about what you see in the photo",
-  "red_flags_visual": [],
-  "green_flags_visual": ["Tecno logo font and spacing correct", "Box print quality sharp"],
-  "clone_brand_visible": false,
-  "clone_brand_name": ""
-}`
-          }
-        ]
-      }]
-    });
-
-    const textBlock = data.content && data.content.find(b => b.type === "text");
-    if (!textBlock) return null;
-    const cleaned = textBlock.text.replace(/```json\s*/gi, "").replace(/```\s*/gi, "").trim();
-    return JSON.parse(cleaned);
-  } catch (e) {
-    console.error("Visual step error:", e.message);
-    return null;
-  }
-}
-
-// ── STEP 3: Final verdict — combines all research into one result ────────────
-async function getFinalVerdict(phoneData, research, visual) {
-  const { brand, model, imei, imeiOk, tac, price, currency, notes } = phoneData;
-
-  const researchBlock = research ? `
-━━━ LIVE GOOGLE RESEARCH (searched just now) ━━━
-Model officially exists: ${research.model_exists}
-Release year: ${research.release_year}
-Official RAM options: ${research.official_specs?.ram_options?.join(", ") || "unknown"}
-Official storage options: ${research.official_specs?.storage_options?.join(", ") || "unknown"}
-Official battery: ${research.official_specs?.battery || "unknown"}
-Official camera: ${research.official_specs?.main_camera || "unknown"}
-Official display: ${research.official_specs?.display || "unknown"}
-Official chipset: ${research.official_specs?.chipset || "unknown"}
-Kenya retail price range: KES ${research.kenya_price_min?.toLocaleString() || "?"} – KES ${research.kenya_price_max?.toLocaleString() || "?"} (from ${research.price_source || "search"})
-Commonly faked in Kenya: ${research.commonly_faked}
-${research.fake_notes ? "Clone/fake details: " + research.fake_notes : ""}
-Search confidence: ${research.search_confidence}
-USE THESE PRICES AND SPECS — they are from live Google search right now.` : `
-━━━ RESEARCH ━━━
-Live Google search unavailable — use your own knowledge carefully. Note: many phones released in 2024-2025 may not be in your training data. Do not flag a model as non-existent unless you are absolutely certain.`;
-
-  const visualBlock = visual ? `
-━━━ VISUAL PHOTO ANALYSIS ━━━
-Visual authenticity score: ${visual.visual_score}/100
-Looks genuine: ${visual.looks_genuine}
-Findings: ${visual.findings}
-Visual red flags: ${visual.red_flags_visual?.join(", ") || "none"}
-Visual green flags: ${visual.green_flags_visual?.join(", ") || "none"}
-Clone brand visible in photo: ${visual.clone_brand_visible}${visual.clone_brand_name ? " — " + visual.clone_brand_name : ""}` : `
-━━━ VISUAL ━━━
-No photo uploaded. Advise buyer to upload a photo next time for better accuracy.`;
-
-  const data = await callClaude({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 1400,
-    system: "You are SimuCheck — Kenya's most accurate phone authentication AI. Be honest and accurate. Respond ONLY with pure JSON — no markdown, no backticks, nothing outside the JSON object.",
-    messages: [{
-      role: "user",
-      content: `You are SimuCheck Kenya. You have just completed Google research and visual analysis. Now give the final verification verdict.
-
-━━━ PHONE SUBMITTED ━━━
+PHONE SUBMITTED FOR VERIFICATION:
 Brand: ${brand}
 Model: ${model}
 IMEI: ${imei}
 IMEI Luhn check: ${imeiOk ? "PASSED ✓" : "FAILED ✗ — major red flag"}
 TAC code (first 8 digits): ${tac}
-Buyer's price: ${price ? price + " " + currency : "not provided"}
-Buyer notes: ${notes || "none"}
+Buyer price: ${price ? price + " " + currency : "not provided"}
+Notes: ${notes || "none"}
+Photo: ${imgB64 ? "YES — analyse the image carefully for authenticity" : "No photo"}
 
-${researchBlock}
-${visualBlock}
+━━━ KENYA MARKET KNOWLEDGE ━━━
 
-━━━ KENYA CLONE KNOWLEDGE ━━━
-- U-FM: makes phones sold as Tecno Camon, Samsung A series
-- Shenzhen generic brands: sold as iPhone, Samsung, Tecno
-- Storage fraud: claims 256GB but actually 8–16GB
-- Price fraud: 40%+ below genuine Kenya price = red flag
-- Redmi 15C, Samsung A07, Tecno Camon 40 Pro, Infinix Hot 40 are ALL real phones released in 2024 — do not flag as non-existent
+REAL PRICES IN KENYA (2025):
+iPhone 16 Pro Max: KES 185,000–230,000
+iPhone 15: KES 95,000–120,000
+iPhone 14: KES 75,000–95,000
+iPhone 13: KES 55,000–75,000
+Samsung Galaxy S24 Ultra: KES 130,000–160,000
+Samsung Galaxy S24: KES 95,000–120,000
+Samsung Galaxy A55: KES 38,000–48,000
+Samsung Galaxy A35: KES 26,000–34,000
+Samsung Galaxy A25: KES 18,000–24,000
+Samsung Galaxy A17: KES 13,000–17,000
+Samsung Galaxy A15: KES 11,000–15,000
+Samsung Galaxy A07: KES 10,000–14,000 (128GB up to KES 16,000)
+Samsung Galaxy A06: KES 9,000–12,000
+Samsung Galaxy A05s: KES 10,000–13,000
+Samsung Galaxy A05: KES 8,000–11,000
+Tecno Camon 40 Pro (genuine Tecno): KES 28,000–35,000
+Tecno Camon 30 Pro: KES 22,000–28,000
+Tecno Spark 30 Pro: KES 14,000–18,000
+Infinix Note 40 Pro: KES 24,000–30,000
+Infinix Hot 40 Pro: KES 16,000–20,000
+Xiaomi Redmi Note 13 Pro: KES 24,000–32,000
+Xiaomi Redmi 15C: KES 12,000–16,000
+Xiaomi Redmi 13C: KES 10,000–14,000
+Benco S1 Plus: KES 7,000–10,000
+Benco V60: KES 5,000–8,000
+Honor X8b: KES 16,000–22,000
+Nokia G42: KES 14,000–18,000
+Itel A70: KES 5,000–8,000
 
-━━━ SCORING ━━━
-Start: 85
-IMEI Luhn FAIL: -35
-Model confirmed non-existent by Google search: -50
-TAC returns different manufacturer: -30
-Price 40%+ below confirmed Kenya price: -20
-Visual shows clone/fake: -15 to -25
-Storage fraud pattern: -15
-Clone brand in photo: -30
-All checks pass: +10
+REAL PHONES — DO NOT FLAG AS FAKE OR NON-EXISTENT:
+- Samsung Galaxy A17 (2024) — real phone
+- Redmi 15C (2024) — real Xiaomi/Redmi phone
+- Benco S1 Plus — real phone by Vmobile Kenya
+- Tecno Camon 40 Pro — real phone (genuine costs KES 28,000–35,000)
+- Honor phones — real brand (spun off from Huawei 2020)
+- ZTE phones — real brand with Kenya presence
+- Infinix, Tecno, Itel — all real (Transsion Holdings)
 
-GENUINE=75+, SUSPICIOUS=45-74, FAKE=below 45
+CLONE & FAKE PATTERNS IN KENYA:
+- U-FM brand: makes clones sold as "Tecno Camon 40 Pro" etc for KES 6,000–10,000
+- Shenzhen generic brands: sold as Samsung/iPhone/Tecno
+- "Tecno Camon 40 Pro" for under KES 20,000 = almost certainly U-FM clone
+- "iPhone 15" for under KES 40,000 = definitely fake
+- "Samsung S24 Ultra" for under KES 50,000 = definitely fake
+- Storage fraud: phone claims 256GB but actually 8–16GB with software tricks
+- IMEI all zeros or repeating = fake
+- Box says one brand, phone says another = clone fraud
 
-Respond ONLY with this exact JSON:
+TAC CODE KNOWLEDGE:
+- Samsung: mostly 35xxxxxx
+- Apple: mostly 01xxxxxx or 35xxxxxx
+- Transsion (Tecno/Infinix/Itel): 35xxxxxx, 86xxxxxx, 52xxxxxx
+- Xiaomi/Redmi: 86xxxxxx, 35xxxxxx
+- Benco/Vmobile: 86xxxxxx
+- Generic Chinese clones: often 86xxxxxx or 99xxxxxx
+
+SCORING:
+Start at 85.
+IMEI Luhn FAIL: subtract 35
+Model confirmed non-existent: subtract 50 (max score 25)
+TAC clearly wrong manufacturer: subtract 30
+Price 40%+ below Kenya market: subtract 20
+Storage fraud (high GB claim + very low price): subtract 15
+Visual shows clone/fake signs: subtract 15 to 25
+Clone brand visible in photo: subtract 30
+All checks pass strongly: add 10
+
+GENUINE = 75+, SUSPICIOUS = 45–74, FAKE = below 45
+
+${imgB64 ? "IMPORTANT: Analyse the uploaded photo carefully. Check logo, box design, specs label, build quality, any clone brand names visible." : ""}
+
+Respond ONLY with this exact JSON — no markdown, no backticks, nothing outside the JSON:
 {
   "score": <0-100>,
   "verdict": "<GENUINE|SUSPICIOUS|FAKE>",
@@ -205,90 +164,84 @@ Respond ONLY with this exact JSON:
   "confidence": "<HIGH|MEDIUM|LOW>",
   "imei_result": {"passed": <true|false>, "detail": "<2 sentences>"},
   "tac_result": {"passed": <true|false|null>, "detail": "<2 sentences>"},
-  "model_result": {"exists": <true|false>, "release_year": "<year>", "detail": "<2 sentences confirmed by Google>"},
-  "price_result": {"realistic": <true|false|null>, "genuine_range_kes": "<KES X–Y>", "detail": "<2 sentences from live data>"},
-  "specs_match": {"checked": <true|false>, "detail": "<2 sentences — do claimed specs match official?>"},
-  "visual_result": {"detail": "<2 sentences>"},
+  "model_result": {"exists": <true|false>, "detail": "<2 sentences>"},
+  "price_result": {"realistic": <true|false|null>, "genuine_range_kes": "<e.g. KES 10,000–14,000>", "detail": "<2 sentences>"},
+  "visual_result": {"detail": "<2 sentences about photo or advice to upload>"},
   "storage_warning": <true|false>,
-  "storage_warning_detail": "<storage fraud warning or empty string>",
+  "storage_warning_detail": "<storage fraud warning if true, empty string if false>",
   "clone_warning": <true|false>,
-  "clone_warning_detail": "<clone explanation or empty string>",
-  "red_flags": ["<specific red flags only>"],
-  "green_flags": ["<positive signals>"],
+  "clone_warning_detail": "<clone explanation if true, empty string if false>",
+  "red_flags": ["<specific red flags only — empty array if none>"],
+  "green_flags": ["<positive signals — empty array if none>"],
   "physical_checks": ["<2-3 things to check physically in the shop right now>"],
-  "advice": "<3-4 sentences direct honest advice>",
+  "advice": "<3-4 sentences of direct honest practical advice>",
   "service_centre": "<brand service centre in Nairobi for official confirmation>",
   "certificate_note": "<one sentence about using this result in a dispute>"
-}`
-    }]
-  });
+}`,
+    });
 
-  const textBlock = data.content && data.content.find(b => b.type === "text");
-  if (!textBlock || !textBlock.text) throw new Error("No verdict received from AI");
-  const cleaned = textBlock.text.replace(/```json\s*/gi, "").replace(/```\s*/gi, "").trim();
-  return JSON.parse(cleaned);
-}
+    const requestBody = JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1400,
+      system: "You are SimuCheck — Kenya's phone authentication AI. Be accurate and honest. Never falsely flag a genuine phone as fake. Respond ONLY with pure JSON — no markdown, no backticks, nothing outside the JSON object.",
+      messages: [{ role: "user", content: userContent }],
+    });
 
-// ── MAIN HANDLER ─────────────────────────────────────────────────────────────
-exports.handler = async function (event) {
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method Not Allowed" };
-  }
-
-  try {
-    const incoming = JSON.parse(event.body);
-    const userMsg = incoming.messages?.[0]?.content;
-    const textPart = Array.isArray(userMsg) ? userMsg.find(b => b.type === "text") : null;
-    const imgPart  = Array.isArray(userMsg) ? userMsg.find(b => b.type === "image") : null;
-    const text = textPart?.text || (typeof userMsg === "string" ? userMsg : "");
-
-    // Extract phone details from structured prompt text
-    const extract = (pattern) => { const m = text.match(pattern); return m ? m[1].trim() : ""; };
-    const brand    = extract(/Brand:\s*([^\n]+)/);
-    const model    = extract(/Model:\s*([^\n]+)/);
-    const imei     = extract(/IMEI:\s*(\d+)/);
-    const price    = extract(/Price:\s*(\d+)/);
-    const currency = text.match(/Price:\s*\d+\s*(\w+)/)?.[1] || "KES";
-    const notes    = extract(/Notes:\s*([^\n]+)/);
-    const tac      = imei ? imei.substring(0, 8) : "";
-
-    // IMEI Luhn
-    function luhn(n) {
-      if (!/^\d{15}$/.test(n)) return false;
-      let s = 0;
-      for (let i = 0; i < 15; i++) {
-        let d = parseInt(n[i]);
-        if (i % 2 === 1) { d *= 2; if (d > 9) d -= 9; }
-        s += d;
-      }
-      return s % 10 === 0;
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      throw new Error("API key not configured. Please add ANTHROPIC_API_KEY in Netlify environment variables.");
     }
-    const imeiOk = luhn(imei);
 
-    const imgB64  = imgPart?.source?.data || null;
-    const imgMime = imgPart?.source?.media_type || "image/jpeg";
-    const phoneData = { brand, model, imei, imeiOk, tac, price, currency, notes };
+    const result = await httpsPost(
+      {
+        hostname: "api.anthropic.com",
+        path: "/v1/messages",
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+          "Content-Length": Buffer.byteLength(requestBody),
+        },
+      },
+      requestBody
+    );
 
-    // Run research + visual in parallel, then get final verdict
-    const [research, visual] = await Promise.all([
-      researchPhone(brand, model, price, currency),
-      analysePhoto(imgB64, imgMime, brand, model)
-    ]);
+    if (result.status !== 200) {
+      const msg = result.body?.error?.message || `API error ${result.status}`;
+      throw new Error(msg);
+    }
 
-    const verdict = await getFinalVerdict(phoneData, research, visual);
+    const textBlock = result.body.content && result.body.content.find((b) => b.type === "text");
+    if (!textBlock || !textBlock.text) throw new Error("No response from AI. Please try again.");
+
+    const cleaned = textBlock.text
+      .replace(/```json\s*/gi, "")
+      .replace(/```\s*/gi, "")
+      .trim();
+
+    const verdict = JSON.parse(cleaned);
 
     return {
       statusCode: 200,
-      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
-      body: JSON.stringify({ content: [{ type: "text", text: JSON.stringify(verdict) }] }),
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify(verdict),
     };
 
   } catch (err) {
-    console.error("SimuCheck agent error:", err.message);
+    console.error("SimuCheck error:", err.message);
     return {
       statusCode: 500,
-      headers: { "Access-Control-Allow-Origin": "*" },
-      body: JSON.stringify({ error: { message: err.message || "Verification failed. Please try again." } }),
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify({
+        error: { message: err.message || "Verification failed. Please try again." },
+      }),
     };
   }
 };
