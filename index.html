@@ -2,226 +2,999 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-<meta name="description" content="SimuCheck — Verify any phone before you buy. AI-powered. Made for Kenyans."/>
-<meta name="theme-color" content="#04080f"/>
-<title>SimuCheck — Don't Buy Blind</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<meta name="description" content="SimuScan — Kenya's most trusted phone verification platform. Know before you pay."/>
+<meta name="theme-color" content="#000"/>
+<title>SimuScan — Know Before You Pay</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
-:root{--bg:#04080f;--surface:#090f1a;--surface2:#0d1420;--border:#1a2535;--border2:#253045;--blue:#2461e8;--blue-l:#4d82f5;--blue-glow:rgba(36,97,232,0.15);--green:#0ec974;--green-d:#09a05b;--red:#f03d3d;--amber:#f5a623;--text:#eef2f8;--text2:#7a90aa;--text3:#3a4f65;--fd:'Syne',sans-serif;--fb:'DM Sans',sans-serif}
+/* ── RESET & BASE ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#000;--white:#fff;--off:#0a0a0a;
+  --panel:#111;--panel2:#161616;--panel3:#1c1c1c;
+  --border:#222;--border2:#2a2a2a;
+  --green:#00e676;--green-dim:#00c060;--green-glow:rgba(0,230,118,.15);
+  --red:#ff3d3d;--amber:#ffb300;
+  --text:#f0f0f0;--text2:#888;--text3:#444;
+  --display:'Bebas Neue',sans-serif;
+  --body:'Outfit',sans-serif;
+}
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100vh;overflow-x:hidden}
-.nav{position:sticky;top:0;z-index:100;background:rgba(4,8,15,0.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px;height:58px;display:flex;align-items:center;justify-content:space-between}
-.logo{display:flex;align-items:center;gap:10px;cursor:pointer;text-decoration:none}
-.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,#2461e8,#1a4fc0);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 16px rgba(36,97,232,.4)}
-.logo-name{font-family:var(--fd);font-size:18px;font-weight:900;color:var(--text);letter-spacing:.04em}
-.logo-tag{font-size:9px;color:var(--blue-l);letter-spacing:.2em;text-transform:uppercase;margin-top:-2px}
-.btn{border:none;border-radius:8px;cursor:pointer;font-family:var(--fb);font-weight:600;transition:all .18s}
-.btn-primary{background:linear-gradient(135deg,#2461e8,#1a4fc0);color:#fff;padding:8px 18px;font-size:13px;font-weight:700;box-shadow:0 4px 14px rgba(36,97,232,.35)}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(36,97,232,.45)}
-.page{display:none}.page.active{display:block}
+body{background:var(--black);color:var(--text);font-family:var(--body);font-weight:400;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* ── PAGES ── */
+.page{display:none!important}
+.page.active{display:block!important}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;height:56px;
+  background:rgba(0,0,0,.85);
+  backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+}
+.nav-brand{display:flex;align-items:center;gap:10px;cursor:pointer;text-decoration:none}
+.nav-logo{
+  width:30px;height:30px;
+  background:var(--green);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;color:#000;font-weight:700;
+  flex-shrink:0;
+}
+.nav-name{font-family:var(--display);font-size:22px;letter-spacing:.08em;color:var(--white)}
+.nav-tag{font-size:9px;color:var(--green);letter-spacing:.2em;text-transform:uppercase;margin-top:-2px}
+.nav-cta{
+  background:var(--green);color:#000;border:none;
+  border-radius:6px;padding:8px 18px;
+  font-family:var(--body);font-size:13px;font-weight:700;
+  cursor:pointer;letter-spacing:.03em;
+  transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.nav-cta:active{transform:scale(.97)}
+
+/* ── HOME ── */
+#page-home{padding-top:56px}
+
 /* HERO */
-.hero{padding:52px 20px 40px;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--border)}
-.hero::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:280px;background:radial-gradient(ellipse,rgba(36,97,232,.11) 0%,transparent 70%);pointer-events:none}
-.pill{display:inline-flex;align-items:center;gap:6px;background:rgba(36,97,232,.1);border:1px solid rgba(36,97,232,.25);border-radius:100px;padding:5px 14px;font-size:11px;color:var(--blue-l);letter-spacing:.12em;text-transform:uppercase;margin-bottom:20px}
-.hero h1{font-family:var(--fd);font-size:clamp(29px,8.5vw,52px);font-weight:900;line-height:1.07;letter-spacing:-.02em;margin-bottom:10px}
-.hero h1 .red{color:#f03d3d}
-.hero h1 .accent{background:linear-gradient(90deg,#4d82f5,#7aa8ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hero-sub{font-size:clamp(14px,3.8vw,17px);color:var(--text2);max-width:400px;margin:0 auto 6px;line-height:1.65}
-.hero-free{font-size:13px;color:var(--green);margin-bottom:26px}
-.hero-cta{background:linear-gradient(135deg,#2461e8,#1a4fc0);border:none;border-radius:12px;padding:16px 36px;color:#fff;font-family:var(--fd);font-size:16px;font-weight:800;cursor:pointer;letter-spacing:.04em;box-shadow:0 8px 28px rgba(36,97,232,.38);transition:all .2s;display:inline-block}
-.hero-cta:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(36,97,232,.48)}
-/* STATS */
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border)}
-.stat{background:var(--bg);padding:20px 10px;text-align:center}
-.stat-n{font-family:var(--fd);font-size:clamp(15px,4.2vw,23px);font-weight:900;color:var(--blue-l)}
-.stat-l{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.4}
+.hero{
+  min-height:calc(100vh - 56px);
+  display:flex;flex-direction:column;justify-content:center;
+  padding:60px 24px 40px;
+  position:relative;overflow:hidden;
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 30%, rgba(0,230,118,.06) 0%, transparent 70%),
+    repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(255,255,255,.015) 60px, rgba(255,255,255,.015) 61px),
+    repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(255,255,255,.015) 60px, rgba(255,255,255,.015) 61px);
+  pointer-events:none;
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--green);margin-bottom:24px;
+}
+.hero-eyebrow::before{content:'';width:20px;height:1px;background:var(--green)}
+.hero h1{
+  font-family:var(--display);
+  font-size:clamp(52px,13vw,110px);
+  line-height:.95;letter-spacing:.02em;
+  color:var(--white);margin-bottom:8px;
+}
+.hero h1 em{color:var(--green);font-style:normal}
+.hero-sub{
+  font-size:clamp(15px,4vw,20px);
+  color:var(--text2);max-width:480px;
+  line-height:1.6;margin-bottom:40px;font-weight:300;
+}
+.hero-sub strong{color:var(--text);font-weight:600}
+.hero-actions{display:flex;flex-direction:column;gap:12px;max-width:320px}
+.btn-verify{
+  background:var(--green);color:#000;border:none;
+  border-radius:8px;padding:18px 32px;
+  font-family:var(--body);font-size:16px;font-weight:700;
+  cursor:pointer;letter-spacing:.03em;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+  position:relative;z-index:10;
+}
+.btn-verify:active{transform:scale(.98)}
+.btn-verify:hover{background:#00ff88}
+.hero-note{font-size:12px;color:var(--text3);letter-spacing:.05em}
+
+/* TRUST BAR */
+.trust-bar{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+.trust-item{
+  padding:28px 16px;text-align:center;
+  border-right:1px solid var(--border);
+}
+.trust-item:last-child{border-right:none}
+.trust-num{
+  font-family:var(--display);
+  font-size:clamp(26px,6vw,40px);
+  letter-spacing:.04em;color:var(--green);
+  display:block;margin-bottom:4px;
+}
+.trust-label{font-size:11px;color:var(--text3);line-height:1.4;font-weight:500}
+
 /* SECTIONS */
-.sec{padding:38px 20px;border-bottom:1px solid var(--border)}
-.sec-inner{max-width:500px;margin:0 auto}
-.sec-tag{font-size:11px;color:var(--blue-l);letter-spacing:.18em;text-transform:uppercase;margin-bottom:8px}
-.sec-title{font-family:var(--fd);font-size:22px;font-weight:800;margin-bottom:6px}
-.sec-sub{font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
-.card-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
-.card-desc{font-size:12px;color:var(--text2);line-height:1.5}
-.cnum{width:20px;height:20px;border-radius:50%;background:rgba(36,97,232,.12);border:1px solid rgba(36,97,232,.28);color:var(--blue-l);font-size:10px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;margin-right:5px}
-.chk{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 15px;margin-bottom:8px}
-.chk-icon{font-size:18px;flex-shrink:0}
-.chk-info{flex:1}
-.chk-name{font-size:13px;font-weight:600;color:var(--text)}
-.chk-desc{font-size:11px;color:var(--text3);margin-top:2px}
-.chk-w{font-size:11px;color:var(--text3);font-weight:700;flex-shrink:0}
-/* SELLER BADGE */
-.badge-box{background:linear-gradient(135deg,rgba(14,201,116,.07),rgba(9,160,91,.04));border:1px solid rgba(14,201,116,.25);border-radius:16px;padding:24px 20px;margin-bottom:10px}
-.badge-title{font-family:var(--fd);font-size:19px;font-weight:800;margin-bottom:8px}
-.badge-desc{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:14px}
-.badge-features{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
-.badge-feat{font-size:13px;color:var(--text2);display:flex;gap:8px;align-items:flex-start}
-.badge-feat::before{content:'✓';color:var(--green);flex-shrink:0;font-weight:700}
-.badge-cta{width:100%;background:linear-gradient(135deg,#0ec974,#09a05b);border:none;border-radius:10px;padding:13px;color:#fff;font-family:var(--fd);font-size:14px;font-weight:800;cursor:pointer;letter-spacing:.04em;box-shadow:0 4px 16px rgba(14,201,116,.3)}
-/* FORM */
-.form-wrap{max-width:500px;margin:0 auto;padding:24px 16px 50px}
-.back-btn{background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;padding:0;margin-bottom:16px;font-family:var(--fb)}
-.back-btn:hover{color:var(--text2)}
-.form-title{font-family:var(--fd);font-size:24px;font-weight:800;margin-bottom:4px}
-.form-sub{font-size:13px;color:var(--text2);margin-bottom:18px}
-.field{margin-bottom:16px}
-.field-label{display:block;font-size:11px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-bottom:7px}
+.section{padding:64px 24px;border-bottom:1px solid var(--border)}
+.section-inner{max-width:560px;margin:0 auto}
+.section-label{
+  font-size:10px;font-weight:700;letter-spacing:.25em;
+  text-transform:uppercase;color:var(--green);
+  margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-label::before{content:'';width:16px;height:1px;background:var(--green)}
+.section-title{
+  font-family:var(--display);
+  font-size:clamp(36px,8vw,56px);
+  line-height:1;letter-spacing:.03em;
+  color:var(--white);margin-bottom:16px;
+}
+.section-body{font-size:15px;color:var(--text2);line-height:1.7;font-weight:300}
+
+/* HOW IT WORKS */
+.steps{display:flex;flex-direction:column;gap:0;margin-top:32px}
+.step{
+  display:flex;gap:20px;align-items:flex-start;
+  padding:20px 0;border-bottom:1px solid var(--border);
+}
+.step:last-child{border-bottom:none}
+.step-num{
+  font-family:var(--display);font-size:40px;
+  color:var(--border2);line-height:1;flex-shrink:0;width:44px;
+}
+.step-icon{font-size:22px;margin-top:2px;flex-shrink:0}
+.step-title{font-size:15px;font-weight:700;color:var(--white);margin-bottom:4px}
+.step-desc{font-size:13px;color:var(--text2);line-height:1.6}
+
+/* CHECKS GRID */
+.checks{display:flex;flex-direction:column;gap:1px;margin-top:28px;background:var(--border)}
+.check-item{
+  display:flex;align-items:center;gap:14px;
+  background:var(--off);padding:14px 18px;
+}
+.check-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--green);flex-shrink:0;
+}
+.check-name{font-size:14px;font-weight:600;color:var(--text);flex:1}
+.check-pct{font-size:12px;color:var(--text3);font-weight:500}
+
+/* SELLER SECTION */
+.seller-card{
+  background:var(--panel);border:1px solid var(--border2);
+  border-radius:12px;padding:28px;margin-top:24px;
+}
+.seller-badge-preview{
+  display:inline-flex;align-items:center;gap:10px;
+  background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.25);
+  border-radius:8px;padding:10px 16px;margin-bottom:20px;
+}
+.seller-badge-icon{font-size:20px}
+.seller-badge-text{font-size:12px;color:var(--green);font-weight:700;letter-spacing:.05em}
+.seller-title{font-size:20px;font-weight:700;color:var(--white);margin-bottom:10px}
+.seller-desc{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:18px}
+.seller-features{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.seller-feat{font-size:13px;color:var(--text2);display:flex;gap:10px;align-items:flex-start}
+.seller-feat::before{content:'→';color:var(--green);flex-shrink:0;font-weight:700}
+.seller-pricing{
+  display:flex;gap:10px;flex-direction:column;margin-bottom:20px;
+}
+.price-tier{
+  background:var(--panel2);border:1px solid var(--border2);
+  border-radius:8px;padding:14px 16px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.price-tier.featured{border-color:var(--green);background:rgba(0,230,118,.04)}
+.price-tier-name{font-size:13px;font-weight:600;color:var(--text)}
+.price-tier-detail{font-size:11px;color:var(--text3);margin-top:2px}
+.price-tier-price{font-family:var(--display);font-size:22px;color:var(--green);letter-spacing:.04em}
+.btn-seller{
+  width:100%;background:transparent;border:1px solid var(--green);
+  color:var(--green);border-radius:8px;padding:14px;
+  font-family:var(--body);font-size:14px;font-weight:700;cursor:pointer;
+  letter-spacing:.05em;transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.btn-seller:active{background:rgba(0,230,118,.1)}
+
+/* DISCLAIMER */
+.disclaimer{
+  margin:24px;padding:16px 20px;
+  background:rgba(255,179,0,.04);
+  border:1px solid rgba(255,179,0,.15);
+  border-radius:10px;
+}
+.disclaimer-title{font-size:11px;font-weight:700;color:var(--amber);letter-spacing:.1em;margin-bottom:6px}
+.disclaimer-text{font-size:13px;color:#a08040;line-height:1.65}
+
+/* FOOTER */
+footer{padding:24px;text-align:center;font-size:11px;color:var(--text3);border-top:1px solid var(--border);letter-spacing:.05em}
+
+/* ── CHECKER PAGE ── */
+#page-checker{padding-top:56px}
+.checker-wrap{max-width:520px;margin:0 auto;padding:32px 20px 80px}
+.page-back{
+  background:none;border:none;color:var(--text3);
+  font-size:13px;cursor:pointer;padding:0;
+  font-family:var(--body);display:flex;align-items:center;gap:6px;
+  margin-bottom:24px;-webkit-tap-highlight-color:transparent;
+}
+.page-back:active{color:var(--text)}
+.checker-title{
+  font-family:var(--display);
+  font-size:clamp(36px,9vw,52px);
+  letter-spacing:.04em;color:var(--white);
+  margin-bottom:6px;line-height:1;
+}
+.checker-sub{font-size:14px;color:var(--text2);margin-bottom:28px;font-weight:300}
+.free-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--green-glow);border:1px solid rgba(0,230,118,.3);
+  border-radius:6px;padding:8px 14px;margin-bottom:24px;
+  font-size:13px;color:var(--green);font-weight:600;
+}
+.err-box{
+  background:rgba(255,61,61,.08);border:1px solid rgba(255,61,61,.25);
+  border-radius:8px;padding:12px 16px;margin-bottom:18px;
+  font-size:13px;color:#f09090;line-height:1.5;display:none;
+}
+.imei-tip{
+  background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.15);
+  border-radius:8px;padding:12px 16px;margin-bottom:22px;
+  font-size:13px;color:#5db880;line-height:1.6;
+}
+.imei-tip strong{color:var(--text)}
+
+/* FORM FIELDS */
+.field{margin-bottom:18px}
+.field-label{
+  display:block;font-size:10px;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--text3);margin-bottom:8px;
+}
 .field-label .req{color:var(--red)}
-.inp{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:13px 14px;color:var(--text);font-size:15px;font-family:var(--fb);outline:none;transition:border-color .18s;appearance:none;-webkit-appearance:none;box-sizing:border-box}
-.inp:focus{border-color:var(--blue)}
-.inp.valid{border-color:var(--green)}
-.inp.invalid{border-color:var(--red)}
-textarea.inp{resize:none}
+.field-label .hint{
+  font-size:10px;color:var(--text3);text-transform:none;
+  letter-spacing:0;font-weight:400;margin-left:4px;
+}
+.inp{
+  width:100%;background:var(--panel);
+  border:1px solid var(--border2);border-radius:8px;
+  padding:14px 16px;color:var(--text);
+  font-size:15px;font-family:var(--body);
+  outline:none;transition:border-color .15s;
+  appearance:none;-webkit-appearance:none;
+}
+.inp:focus{border-color:#444}
+.inp.inp-valid{border-color:var(--green)}
+.inp.inp-invalid{border-color:var(--red)}
+select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23444' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+textarea.inp{resize:none;line-height:1.5}
 .price-row{display:flex;gap:8px}
-.photo-lbl{display:block;cursor:pointer;border:2px dashed var(--border2);border-radius:12px;padding:24px 16px;text-align:center;background:transparent;transition:border-color .2s,background .2s}
-.photo-lbl:hover{border-color:var(--blue);background:var(--blue-glow)}
-.photo-lbl.has-photo{border-color:var(--blue);background:var(--blue-glow);border-style:solid}
-.photo-lbl input[type=file]{display:none}
-.photo-prev{max-height:110px;max-width:100%;border-radius:8px;display:block;margin:0 auto 10px}
-.ib{border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13px;line-height:1.6}
-.ib-blue{background:rgba(36,97,232,.07);border:1px solid rgba(36,97,232,.2);color:#7aa8ff}
-.ib-green{background:rgba(14,201,116,.07);border:1px solid rgba(14,201,116,.22);color:#5dd9a0}
-.ib-red{background:rgba(240,61,61,.08);border:1px solid rgba(240,61,61,.25);color:#f09090}
-.ib-amber{background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.22);color:#d4a855}
-.sub-btn{width:100%;background:linear-gradient(135deg,#2461e8,#1a4fc0);border:none;border-radius:12px;padding:16px;color:#fff;font-family:var(--fd);font-size:16px;font-weight:800;cursor:pointer;letter-spacing:.04em;box-shadow:0 6px 22px rgba(36,97,232,.35);transition:all .2s;margin-top:6px}
-.sub-btn:hover{transform:translateY(-1px)}
-.form-note{text-align:center;font-size:11px;color:var(--text3);margin-top:10px}
-/* CHECKING */
-.chk-wrap{min-height:calc(100vh - 58px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px}
-.chk-anim-icon{width:64px;height:64px;background:rgba(36,97,232,.1);border:2px solid rgba(36,97,232,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:18px;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(36,97,232,.3)}50%{box-shadow:0 0 0 12px rgba(36,97,232,0)}}
-.anim-steps{width:100%;max-width:380px;display:flex;flex-direction:column;gap:9px}
-.anim-step{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px;padding:13px 15px;transition:all .35s}
-.anim-step.done{background:rgba(14,201,116,.06);border-color:rgba(14,201,116,.2)}
-.anim-step.active{border-color:rgba(36,97,232,.3)}
-.anim-step-icon{font-size:15px}
-.anim-step-text{font-size:13px;color:var(--text3)}
-.anim-step.done .anim-step-text{color:#a0e8c8}
-.anim-step.active .anim-step-text{color:#fde68a}
-/* RESULT */
-.res-wrap{max-width:500px;margin:0 auto;padding:20px 16px 50px}
-.verdict-card{border-radius:16px;padding:28px 20px;text-align:center;margin-bottom:16px;border:2px solid}
-.v-tag{font-size:11px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:6px;opacity:.7}
-.v-emoji{font-size:46px;margin-bottom:6px}
-.v-name{font-family:var(--fd);font-size:clamp(28px,7vw,40px);font-weight:900}
-.v-score{font-family:var(--fd);font-size:52px;font-weight:900;line-height:1;margin:8px 0 4px}
-.v-score span{font-size:16px;color:var(--text3)}
-.v-headline{font-size:13px;color:var(--text2);line-height:1.55;margin-top:10px;max-width:320px;margin-left:auto;margin-right:auto}
-.v-conf{display:inline-block;margin-top:10px;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700}
-.bk-label{font-size:11px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-bottom:9px;margin-top:6px}
-.bk-row{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 15px;margin-bottom:8px}
-.bk-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
-.bk-name{font-size:12px;font-weight:700;color:#d1d5db}
-.bk-pass{font-size:12px;font-weight:800}
-.pass{color:var(--green)}.fail{color:var(--red)}.na{color:var(--text3)}
-.bk-detail{font-size:12px;color:var(--text3);line-height:1.55}
-.bk-range{font-size:12px;color:var(--blue-l);margin-top:4px}
-.flags-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.flag-box{border-radius:10px;padding:13px}
-.flag-box.red{background:rgba(240,61,61,.06);border:1px solid rgba(240,61,61,.2)}
-.flag-box.green{background:rgba(14,201,116,.06);border:1px solid rgba(14,201,116,.2)}
-.flag-title{font-size:11px;font-weight:800;margin-bottom:7px}
-.flag-box.red .flag-title{color:var(--red)}
-.flag-box.green .flag-title{color:var(--green)}
-.flag-item{font-size:12px;margin-bottom:5px;line-height:1.4}
-.flag-box.red .flag-item{color:#f09090}
-.flag-box.green .flag-item{color:#6ee7b7}
-.adv-box{border-radius:12px;padding:16px 18px;margin-bottom:12px}
-.adv-title{font-size:11px;font-weight:800;margin-bottom:8px;letter-spacing:.08em}
-.adv-text{font-size:14px;color:#d1d5db;line-height:1.7}
-.res-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
-.btn-out{background:transparent;border:1px solid var(--border);border-radius:10px;padding:13px;color:var(--text2);font-size:13px;cursor:pointer;font-weight:700;font-family:var(--fb)}
-.footer{border-top:1px solid var(--border);padding:18px 20px;text-align:center;font-size:11px;color:var(--text3)}
-@media(max-width:360px){.grid2{grid-template-columns:1fr}.flags-grid{grid-template-columns:1fr}.res-actions{grid-template-columns:1fr}}
+
+/* PHOTO SLOTS */
+.photo-hint{
+  background:var(--panel);border:1px solid var(--border2);
+  border-radius:8px;padding:12px 14px;margin-bottom:12px;
+  font-size:12px;color:var(--text3);line-height:1.6;
+}
+.photo-hint strong{color:var(--text2)}
+.photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.photo-slot{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  border:1px dashed var(--border2);border-radius:10px;
+  padding:16px 10px;text-align:center;cursor:pointer;
+  min-height:88px;transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+  position:relative;
+}
+.photo-slot:active{border-color:#555;background:rgba(255,255,255,.03)}
+.photo-slot.filled{border-color:var(--green);border-style:solid;background:rgba(0,230,118,.04)}
+.photo-slot input[type=file]{display:none}
+.slot-icon{font-size:22px;margin-bottom:6px}
+.slot-label{font-size:11px;color:var(--text3)}
+.slot-opt{font-size:10px;color:var(--text3);opacity:.5;margin-top:2px}
+.slot-thumb{max-height:56px;max-width:100%;border-radius:6px;display:block;margin:0 auto 4px}
+.slot-done{font-size:10px;color:var(--green);margin-top:2px}
+.slot-change{font-size:10px;color:var(--text3);margin-top:1px}
+.photo-counter{font-size:12px;text-align:center;margin-top:8px;color:var(--text3)}
+
+/* SUBMIT */
+.btn-submit{
+  width:100%;background:var(--green);color:#000;border:none;
+  border-radius:8px;padding:18px;
+  font-family:var(--body);font-size:16px;font-weight:700;
+  cursor:pointer;letter-spacing:.03em;
+  transition:all .15s;margin-top:8px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  -webkit-tap-highlight-color:transparent;
+}
+.btn-submit:active{transform:scale(.99);background:#00c060}
+.form-note{text-align:center;font-size:11px;color:var(--text3);margin-top:10px;letter-spacing:.04em}
+
+/* ── CHECKING PAGE ── */
+#page-checking{padding-top:56px}
+.checking-wrap{
+  min-height:calc(100vh - 56px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 24px;
+}
+.checking-ring{
+  width:64px;height:64px;border-radius:50%;
+  border:2px solid var(--border2);border-top-color:var(--green);
+  animation:spin 1s linear infinite;margin-bottom:28px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.checking-title{font-family:var(--display);font-size:28px;letter-spacing:.06em;margin-bottom:6px}
+.checking-sub{font-size:13px;color:var(--text3);margin-bottom:36px}
+.anim-list{width:100%;max-width:360px;display:flex;flex-direction:column;gap:8px}
+.anim-item{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 16px;border-radius:8px;
+  border:1px solid var(--border);
+  background:var(--off);
+  transition:all .3s;
+}
+.anim-item.active{border-color:#333;background:var(--panel)}
+.anim-item.done{border-color:rgba(0,230,118,.2);background:rgba(0,230,118,.04)}
+.anim-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);flex-shrink:0;transition:background .3s}
+.anim-item.active .anim-dot{background:var(--amber);animation:blink .8s infinite}
+.anim-item.done .anim-dot{background:var(--green)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.anim-text{font-size:13px;color:var(--text3)}
+.anim-item.active .anim-text{color:var(--text2)}
+.anim-item.done .anim-text{color:#5db880}
+
+/* ── RESULT PAGE ── */
+#page-result{padding-top:56px}
+.result-wrap{max-width:520px;margin:0 auto;padding:24px 20px 80px}
+
+.verdict-block{
+  border-radius:12px;padding:32px 24px;text-align:center;
+  margin-bottom:20px;border:1px solid;
+}
+.verdict-tag{font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;margin-bottom:14px;opacity:.7}
+.verdict-icon{font-size:48px;margin-bottom:12px}
+.verdict-name{
+  font-family:var(--display);
+  font-size:clamp(36px,9vw,52px);
+  letter-spacing:.05em;color:var(--white);
+  margin-bottom:4px;
+}
+.verdict-score{
+  font-family:var(--display);font-size:56px;
+  font-weight:900;line-height:1;margin:8px 0 4px;
+}
+.verdict-score sub{font-family:var(--body);font-size:14px;color:var(--text3);font-weight:400}
+.verdict-headline{
+  font-size:14px;color:var(--text2);line-height:1.55;
+  margin-top:12px;max-width:340px;margin-left:auto;margin-right:auto;
+  font-weight:300;
+}
+.verdict-conf{
+  display:inline-block;margin-top:12px;
+  border-radius:4px;padding:4px 12px;font-size:11px;font-weight:700;
+  letter-spacing:.08em;
+}
+
+/* RESULT ROWS */
+.result-section-title{
+  font-size:10px;font-weight:700;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--text3);
+  margin:20px 0 10px;
+  display:flex;align-items:center;gap:8px;
+}
+.result-section-title::before{content:'';flex:1;height:1px;background:var(--border)}
+.result-row{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:8px;padding:14px 16px;margin-bottom:8px;
+}
+.result-row-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.result-row-name{font-size:12px;font-weight:700;color:var(--text2)}
+.result-pass{font-size:11px;font-weight:800;letter-spacing:.05em}
+.rpass{color:var(--green)}.rfail{color:var(--red)}.rna{color:var(--text3)}
+.result-detail{font-size:12px;color:var(--text3);line-height:1.6}
+.result-range{font-size:12px;color:#4d9aff;margin-top:4px}
+
+/* FLAGS */
+.flags-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.flag-card{border-radius:8px;padding:14px}
+.flag-card.red{background:rgba(255,61,61,.06);border:1px solid rgba(255,61,61,.18)}
+.flag-card.green{background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.18)}
+.flag-card-title{font-size:10px;font-weight:800;letter-spacing:.12em;margin-bottom:8px}
+.flag-card.red .flag-card-title{color:var(--red)}
+.flag-card.green .flag-card-title{color:var(--green)}
+.flag-item{font-size:11px;margin-bottom:5px;line-height:1.4}
+.flag-card.red .flag-item{color:#f09090}
+.flag-card.green .flag-item{color:#6ee7b7}
+
+/* ADVICE CARDS */
+.advice-card{border-radius:8px;padding:16px 18px;margin-bottom:10px}
+.advice-title{font-size:10px;font-weight:800;letter-spacing:.15em;margin-bottom:8px}
+.advice-body{font-size:13px;color:#c0c0c0;line-height:1.7;font-weight:300}
+
+/* PHYSICAL CHECKS */
+.check-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.check-list-item{
+  display:flex;gap:10px;align-items:flex-start;
+  font-size:13px;color:#5db880;
+  background:rgba(0,230,118,.04);border:1px solid rgba(0,230,118,.12);
+  border-radius:6px;padding:10px 12px;
+}
+.check-list-item::before{content:'→';color:var(--green);flex-shrink:0;font-weight:700}
+
+/* WARNING CARDS */
+.warn-card{border-radius:8px;padding:14px 16px;margin-bottom:10px}
+.warn-clone{background:rgba(255,61,61,.06);border:1px solid rgba(255,61,61,.2)}
+.warn-storage{background:rgba(255,179,0,.06);border:1px solid rgba(255,179,0,.18)}
+.warn-title{font-size:10px;font-weight:800;letter-spacing:.12em;margin-bottom:6px}
+.warn-clone .warn-title{color:var(--red)}
+.warn-storage .warn-title{color:var(--amber)}
+.warn-body{font-size:12px;color:#a09090;line-height:1.55}
+.warn-storage .warn-body{color:#a09050}
+
+/* DISCLAIMER RESULT */
+.result-disclaimer{
+  background:rgba(255,179,0,.04);border:1px solid rgba(255,179,0,.12);
+  border-radius:8px;padding:12px 16px;margin-bottom:14px;
+  font-size:12px;color:#806040;line-height:1.6;
+}
+
+/* RESULT ACTIONS */
+.result-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.btn-ghost{
+  background:transparent;border:1px solid var(--border2);
+  border-radius:8px;padding:14px;color:var(--text2);
+  font-size:13px;cursor:pointer;font-weight:600;
+  font-family:var(--body);transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.btn-ghost:active{border-color:#444}
+.result-footer{text-align:center;font-size:11px;color:var(--text3);margin-top:20px;letter-spacing:.05em}
+
+@media(max-width:360px){
+  .trust-bar{grid-template-columns:1fr}
+  .trust-item{border-right:none;border-bottom:1px solid var(--border)}
+  .flags-row{grid-template-columns:1fr}
+  .result-actions{grid-template-columns:1fr}
+  .photo-grid{grid-template-columns:1fr 1fr}
+}
 </style>
 </head>
 <body>
 
-<nav class="nav">
-  <a class="logo" onclick="showPage('home')" href="#">
-    <div class="logo-icon">🛡️</div>
-    <div><div class="logo-name">SimuCheck</div><div class="logo-tag">Made for Kenyans</div></div>
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="#" onclick="showPage('home');return false">
+    <div class="nav-logo">S</div>
+    <div>
+      <div class="nav-name">SIMUSCAN</div>
+      <div class="nav-tag">Kenya Phone Verifier</div>
+    </div>
   </a>
-  <div style="display:flex;gap:8px;align-items:center">
-    <span style="font-size:11px;background:rgba(14,201,116,.1);border:1px solid rgba(14,201,116,.28);color:#0ec974;border-radius:6px;padding:3px 8px;white-space:nowrap">Free to Use</span>
-    <button class="btn btn-primary" onclick="showPage('checker')">Verify Phone</button>
-  </div>
+  <button class="nav-cta" onclick="showPage('checker')">Verify Phone</button>
 </nav>
 
-<!-- HOME -->
+<!-- ════════════════════════ HOME ════════════════════════ -->
 <div class="page active" id="page-home">
+
   <div class="hero">
-    <div class="pill">🇰🇪 Made for Kenyans, by Kenyans</div>
-    <h1>Don't Lose <span class="red">KES 20,000</span><br/>Because You Skipped<br/>a <span class="accent">Free Check</span></h1>
-    <p class="hero-sub">Fake phones are everywhere in Kenya. Verify any phone in 30 seconds before you pay — and buy with total confidence.</p>
-    <p class="hero-free">✓ Completely free — no sign-up, no payment needed</p>
-    <button class="hero-cta" onclick="showPage('checker')">🔍 Check My Phone Now — Free</button>
+    <div class="hero-bg"></div>
+    <div class="hero-eyebrow">🇰🇪 Made for Kenyans</div>
+    <h1>DON'T<br/>LOSE<br/><em>KES 20K</em></h1>
+    <p class="hero-sub">Fake phones are everywhere in Kenya. Before you hand over your money — <strong>scan it.</strong> Know in 30 seconds.</p>
+    <div class="hero-actions">
+      <button class="btn-verify" type="button" onclick="showPage('checker')">
+        <span>Scan My Phone</span>
+        <span>→</span>
+      </button>
+      <div class="hero-note">FREE · No sign-up · Works on any network</div>
+    </div>
   </div>
 
-  <div class="stats">
-    <div class="stat"><div class="stat-n">3 in 5</div><div class="stat-l">Kenyans unknowingly own a fake phone</div></div>
-    <div class="stat"><div class="stat-n">KES 15B+</div><div class="stat-l">Lost to fake phones in Kenya every year</div></div>
-    <div class="stat"><div class="stat-n">30 sec</div><div class="stat-l">To verify any phone with SimuCheck</div></div>
+  <div class="trust-bar">
+    <div class="trust-item"><span class="trust-num">3 in 5</span><div class="trust-label">Kenyans own a fake phone without knowing</div></div>
+    <div class="trust-item"><span class="trust-num">KES 15B</span><div class="trust-label">Lost to counterfeit phones in Kenya yearly</div></div>
+    <div class="trust-item"><span class="trust-num">30 sec</span><div class="trust-label">To verify any phone with SimuScan</div></div>
   </div>
 
-  <div class="sec">
-    <div class="sec-inner">
-      <p class="sec-tag">The Problem</p>
-      <h2 class="sec-title">Someone Is Being Scammed Right Now</h2>
-      <p class="sec-sub">Across Kenya every day, people save for months then lose it all to a fake phone. The packaging looks real. The seller is convincing. By the time you find out, your money is gone.</p>
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--text2)"><span style="color:var(--red);flex-shrink:0">✗</span>Phone model names that are completely invented</div>
-        <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--text2)"><span style="color:var(--red);flex-shrink:0">✗</span>Prices that sound like deals but are really scams</div>
-        <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--text2)"><span style="color:var(--red);flex-shrink:0">✗</span>IMEI numbers that fail basic validity checks</div>
-        <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--text2)"><span style="color:var(--red);flex-shrink:0">✗</span>Fake logos and wrong ports on clone phones</div>
+  <!-- HOW IT WORKS -->
+  <div class="section">
+    <div class="section-inner">
+      <div class="section-label">Process</div>
+      <div class="section-title">HOW IT<br/>WORKS</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div>
+            <div class="step-icon">📱</div>
+            <div class="step-title">Get the IMEI yourself</div>
+            <div class="step-desc">Dial <strong style="color:var(--text)">*#06#</strong> on the phone. The number appears instantly. Never let the seller dial it — always do it yourself.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div>
+            <div class="step-icon">📋</div>
+            <div class="step-title">Enter the details</div>
+            <div class="step-desc">Brand, model, IMEI, price, and any photos you have — box, phone, or both. Photos are optional. Everything helps.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div>
+            <div class="step-icon">🔍</div>
+            <div class="step-title">AI runs the scan</div>
+            <div class="step-desc">8 independent checks run simultaneously — IMEI math, brand match, Kenya price, model verification, visual analysis and more.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">04</div>
+          <div>
+            <div class="step-icon">✅</div>
+            <div class="step-title">Get your verdict</div>
+            <div class="step-desc">Clear result with full breakdown, red flags, and specific advice for your situation right now in the shop.</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="sec">
-    <div class="sec-inner">
-      <p class="sec-tag">How It Works</p>
-      <h2 class="sec-title">4 Steps to Know the Truth</h2>
-      <div class="grid2">
-        <div class="card"><div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><span class="cnum">1</span><span style="font-size:16px">📱</span></div><div class="card-title">Dial *#06#</div><div class="card-desc">Get the IMEI yourself — never let the seller dial it for you</div></div>
-        <div class="card"><div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><span class="cnum">2</span><span style="font-size:16px">📋</span></div><div class="card-title">Enter Details</div><div class="card-desc">Brand, model, price, and upload a photo if possible</div></div>
-        <div class="card"><div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><span class="cnum">3</span><span style="font-size:16px">🤖</span></div><div class="card-title">AI Checks</div><div class="card-desc">8 checks run instantly — IMEI, brand, price, model, visual</div></div>
-        <div class="card"><div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><span class="cnum">4</span><span style="font-size:16px">📄</span></div><div class="card-title">Get Your Result</div><div class="card-desc">Clear verdict with full breakdown and honest advice</div></div>
+  <!-- 8 CHECKS -->
+  <div class="section">
+    <div class="section-inner">
+      <div class="section-label">Engine</div>
+      <div class="section-title">8 CHECKS<br/>AT ONCE</div>
+      <div class="checks">
+        <div class="check-item"><div class="check-dot"></div><div class="check-name">IMEI Luhn Algorithm</div><div class="check-pct">20%</div></div>
+        <div class="check-item"><div class="check-dot"></div><div class="check-name">TAC Brand Match</div><div class="check-pct">20%</div></div>
+        <div class="check-item"><div class="check-dot"></div><div class="check-name">Model Existence Verification</div><div class="check-pct">15%</div></div>
+        <div class="check-item"><div class="check-dot"></div><div class="check-name">Kenya Market Price Check</div><div class="check-pct">15%</div></div>
+        <div class="check-item"><div class="check-dot"></div><div class="check-name">AI Visual Inspection</div><div class="check-pct">15%</div></div>
+        <div class="check-item"><div class="check-dot"></div><div class="check-name">IMEI Pattern Analysis</div><div class="check-pct">10%</div></div>
+        <div class="check-item"><div class="check-dot"></div><div class="check-name">Clone Brand Detection</div><div class="check-pct">3%</div></div>
+        <div class="check-item"><div class="check-dot"></div><div class="check-name">Kenya Counterfeit Context</div><div class="check-pct">2%</div></div>
       </div>
     </div>
   </div>
 
-  <div class="sec">
-    <div class="sec-inner">
-      <p class="sec-tag">The Verification Engine</p>
-      <h2 class="sec-title">8 Independent Checks</h2>
-      <p class="sec-sub">Every verification runs all of these at the same time</p>
-      <div class="chk"><span class="chk-icon">🔢</span><div class="chk-info"><div class="chk-name">IMEI Luhn Algorithm</div><div class="chk-desc">Mathematical formula every genuine phone must pass</div></div><div class="chk-w">20%</div></div>
-      <div class="chk"><span class="chk-icon">🏷️</span><div class="chk-info"><div class="chk-name">TAC Brand Match</div><div class="chk-desc">First 8 digits of IMEI identify the manufacturer</div></div><div class="chk-w">20%</div></div>
-      <div class="chk"><span class="chk-icon">📱</span><div class="chk-info"><div class="chk-name">Model Existence Check</div><div class="chk-desc">Does this model actually exist from this brand?</div></div><div class="chk-w">15%</div></div>
-      <div class="chk"><span class="chk-icon">💰</span><div class="chk-info"><div class="chk-name">Kenya Market Price</div><div class="chk-desc">Is the price realistic for a genuine device in Kenya?</div></div><div class="chk-w">15%</div></div>
-      <div class="chk"><span class="chk-icon">👁️</span><div class="chk-info"><div class="chk-name">AI Visual Inspection</div><div class="chk-desc">Photo analysis — logos, ports, build quality, bezels</div></div><div class="chk-w">15%</div></div>
-      <div class="chk"><span class="chk-icon">🔍</span><div class="chk-info"><div class="chk-name">IMEI Pattern Analysis</div><div class="chk-desc">Detects repeated digits, all zeros, known fake patterns</div></div><div class="chk-w">10%</div></div>
-      <div class="chk"><span class="chk-icon">📦</span><div class="chk-info"><div class="chk-name">Box &amp; IMEI Consistency</div><div class="chk-desc">Does the box sticker match the phone IMEI?</div></div><div class="chk-w">3%</div></div>
-      <div class="chk"><span class="chk-icon">🌍</span><div class="chk-info"><div class="chk-name">Kenya Counterfeit Context</div><div class="chk-desc">Is this model commonly faked in the Kenyan market?</div></div><div class="chk-w">2%</div></div>
+  <!-- TRUSTED SELLER -->
+  <div class="section">
+    <div class="section-inner">
+      <div class="section-label">For Sellers</div>
+      <div class="section-title">TRUSTED<br/>SELLER</div>
+      <div class="section-body">Customers are afraid of buying fake phones. Give them one clear reason to choose your shop over everyone else.</div>
+      <div class="seller-card">
+        <div class="seller-badge-preview">
+          <div class="seller-badge-icon">🏅</div>
+          <div class="seller-badge-text">SIMUSCAN VERIFIED SELLER</div>
+        </div>
+        <div class="seller-title">Display the badge. Build the trust.</div>
+        <div class="seller-desc">Put our Verified Seller badge in your shop window, on your WhatsApp, and your social media. It tells every customer: this seller verifies phones before selling. You are safe here.</div>
+        <ul class="seller-features">
+          <li class="seller-feat">Official Verified Seller badge for your shop</li>
+          <li class="seller-feat">Unlimited phone verifications every month</li>
+          <li class="seller-feat">Business dashboard and scan history</li>
+          <li class="seller-feat">Certificate to show customers on request</li>
+          <li class="seller-feat">Listed in SimuScan Verified Sellers directory</li>
+        </ul>
+        <div class="seller-pricing">
+          <div class="price-tier">
+            <div><div class="price-tier-name">Seller Basic</div><div class="price-tier-detail">50 verifications/month</div></div>
+            <div class="price-tier-price">KES 499<span style="font-size:12px;color:var(--text3)">/mo</span></div>
+          </div>
+          <div class="price-tier featured">
+            <div><div class="price-tier-name">Seller Pro</div><div class="price-tier-detail">Unlimited · API access · Directory listing</div></div>
+            <div class="price-tier-price">KES 999<span style="font-size:12px;color:var(--text3)">/mo</span></div>
+          </div>
+        </div>
+        <button class="btn-seller" type="button" onclick="sellerInterest()">Join the Waiting List →</button>
+        <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:8px">Pay via M-Pesa · Launching soon · Be first</div>
+      </div>
     </div>
   </div>
 
-  <!-- TRUSTED SELLER BADGE -->
-  <div class="sec">
-    <div class="sec-inner">
-      <p class="sec-tag">For Phone Sellers &amp; Shops</p>
-      <h2 class="sec-title">Become a Trusted Seller</h2>
-      <p class="sec-sub">Customers are scared of fake phones. Give them one strong reason to choose your shop over everyone else on the street.</p>
-      <div class="badge-box">
-        <div style="font-size:36px;margin-bottom:10px">🏅</div>
-        <div class="badge-title">SimuCheck Trusted Seller Badge</div>
-        <div class="badge-desc">Display our official badge in your shop, on your WhatsApp, and on your social media. It tells every customer: <strong style="color:var(--text)">"This seller verifies phones before selling. You are safe here."</strong><br/><br/>Customers who know about SimuCheck will walk past other shops to come to you.</div>
-        <div class="badge-features">
-          <div class="badge-feat">Official Trusted Seller badge for your shop window</div>
-          <div class="badge-feat">Unlimited phone
+  <div class="disclaimer">
+    <div class="disclaimer-title">About Our Results</div>
+    <div class="disclaimer-text">SimuScan uses AI analysis to check phones — not direct government databases. Results are advisory. We catch the majority of fakes clearly. For an official final verdict, visit the brand's authorised service centre with the phone in hand.</div>
+  </div>
+
+  <footer>SimuScan · Made for Kenyans, by Kenyans 🇰🇪 · simuscan.co.ke</footer>
+</div>
+
+<!-- ════════════════════════ CHECKER ════════════════════════ -->
+<div class="page" id="page-checker">
+  <div class="checker-wrap">
+    <button class="page-back" type="button" onclick="showPage('home')">← Back</button>
+
+    <div class="free-badge">🔓 Free to use — no sign-up needed</div>
+    <h2 class="checker-title">SCAN YOUR<br/>PHONE</h2>
+    <p class="checker-sub">More details = more accurate result. All fields except Brand, Model and IMEI are optional.</p>
+
+    <div class="err-box" id="errBox"></div>
+
+    <div class="imei-tip">
+      📱 <strong>Get IMEI now:</strong> Dial <strong>*#06#</strong> on the phone. Number appears instantly on screen. Always dial it yourself — never let the seller do it.
+    </div>
+
+    <div class="field">
+      <label class="field-label">Brand <span class="req">*</span></label>
+      <select id="brand" class="inp">
+        <option value="">Select brand...</option>
+        <option>Samsung</option><option>iPhone (Apple)</option><option>Tecno</option>
+        <option>Infinix</option><option>Itel</option><option>Xiaomi</option>
+        <option>Redmi</option><option>POCO</option><option>Huawei</option>
+        <option>Honor</option><option>Oppo</option><option>Vivo</option>
+        <option>Realme</option><option>OnePlus</option><option>Google Pixel</option>
+        <option>Nokia</option><option>Motorola</option><option>Sony</option>
+        <option>ZTE</option><option>Benco</option><option>Gionee</option>
+        <option>Oukitel</option><option>Cubot</option><option>Doogee</option>
+        <option>Umidigi</option><option>Blackview</option><option>Atel</option>
+        <option>HTC</option><option>Other</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Model Name <span class="req">*</span></label>
+      <input type="text" id="model" class="inp" placeholder="e.g. Galaxy A17, Redmi 15C, Camon 40 Pro..."/>
+    </div>
+
+    <div class="field">
+      <label class="field-label">IMEI Number <span class="req">*</span><span class="hint" id="imeiHint"> — 15 digits from *#06#</span></label>
+      <input type="text" id="imei" class="inp" inputmode="numeric" maxlength="15" placeholder="15-digit IMEI" oninput="onImei(this)" style="font-family:monospace;letter-spacing:.1em"/>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Purchase Price<span class="hint"> — helps catch price scams (optional)</span></label>
+      <div class="price-row">
+        <select id="currency" class="inp" style="flex:0 0 88px"><option>KES</option><option>USD</option></select>
+        <input type="number" id="price" class="inp" placeholder="e.g. 14000" style="flex:1"/>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Anything Look Off?<span class="hint"> (optional)</span></label>
+      <textarea id="notes" class="inp" rows="2" placeholder="e.g. Logo looks slightly different, seller is rushing me, box has no seal..."></textarea>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Photos<span class="hint"> — add any you have, all optional</span></label>
+      <div class="photo-hint">
+        <strong>No box? No problem.</strong> Upload whatever you have — front of phone, back of phone, box, or any combination. Even 1 photo helps. Zero photos still works.
+      </div>
+      <div class="photo-grid" id="photoGrid">
+        <label class="photo-slot" id="slot0">
+          <input type="file" accept="image/*" onchange="onSlot(this,0)"/>
+          <div id="slot0-empty"><div class="slot-icon">📦</div><div class="slot-label">Front of Box</div><div class="slot-opt">optional</div></div>
+          <div id="slot0-filled" style="display:none"><img class="slot-thumb" id="slot0-img" src="" alt=""/><div class="slot-done">✓ Front of Box</div><div class="slot-change">tap to change</div></div>
+        </label>
+        <label class="photo-slot" id="slot1">
+          <input type="file" accept="image/*" onchange="onSlot(this,1)"/>
+          <div id="slot1-empty"><div class="slot-icon">📋</div><div class="slot-label">Back of Box</div><div class="slot-opt">optional</div></div>
+          <div id="slot1-filled" style="display:none"><img class="slot-thumb" id="slot1-img" src="" alt=""/><div class="slot-done">✓ Back of Box</div><div class="slot-change">tap to change</div></div>
+        </label>
+        <label class="photo-slot" id="slot2">
+          <input type="file" accept="image/*" onchange="onSlot(this,2)"/>
+          <div id="slot2-empty"><div class="slot-icon">📱</div><div class="slot-label">Front of Phone</div><div class="slot-opt">optional</div></div>
+          <div id="slot2-filled" style="display:none"><img class="slot-thumb" id="slot2-img" src="" alt=""/><div class="slot-done">✓ Front of Phone</div><div class="slot-change">tap to change</div></div>
+        </label>
+        <label class="photo-slot" id="slot3">
+          <input type="file" accept="image/*" onchange="onSlot(this,3)"/>
+          <div id="slot3-empty"><div class="slot-icon">🔄</div><div class="slot-label">Back of Phone</div><div class="slot-opt">optional</div></div>
+          <div id="slot3-filled" style="display:none"><img class="slot-thumb" id="slot3-img" src="" alt=""/><div class="slot-done">✓ Back of Phone</div><div class="slot-change">tap to change</div></div>
+        </label>
+      </div>
+      <div class="photo-counter" id="photoCounter">No photos — verification works without them too</div>
+    </div>
+
+    <button class="btn-submit" type="button" id="submitBtn" onclick="startScan()">
+      <span>🔍</span><span>Run Verification</span>
+    </button>
+    <div class="form-note">Private · Never stored · Free to use</div>
+  </div>
+</div>
+
+<!-- ════════════════════════ CHECKING ════════════════════════ -->
+<div class="page" id="page-checking">
+  <div class="checking-wrap">
+    <div class="checking-ring"></div>
+    <div class="checking-title">SCANNING</div>
+    <div class="checking-sub">Running all checks — please wait</div>
+    <div class="anim-list">
+      <div class="anim-item" id="a0"><div class="anim-dot"></div><div class="anim-text">Validating IMEI number...</div></div>
+      <div class="anim-item" id="a1"><div class="anim-dot"></div><div class="anim-text">Checking brand database...</div></div>
+      <div class="anim-item" id="a2"><div class="anim-dot"></div><div class="anim-text">Checking Kenya market price...</div></div>
+      <div class="anim-item" id="a3"><div class="anim-dot"></div><div class="anim-text">Analysing photos and specs...</div></div>
+      <div class="anim-item" id="a4"><div class="anim-dot"></div><div class="anim-text">Generating verdict...</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════ RESULT ════════════════════════ -->
+<div class="page" id="page-result">
+  <div class="result-wrap" id="resultContent"></div>
+</div>
+
+<script>
+// ── STATE ────────────────────────────────────────────────────────────────────
+var photos=[null,null,null,null];
+var mimes=['image/jpeg','image/jpeg','image/jpeg','image/jpeg'];
+
+// ── PAGE NAVIGATION ──────────────────────────────────────────────────────────
+function showPage(name){
+  var pages=document.querySelectorAll('.page');
+  for(var i=0;i<pages.length;i++) pages[i].classList.remove('active');
+  var target=document.getElementById('page-'+name);
+  if(target) target.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(name==='checker'){
+    var eb=document.getElementById('errBox');
+    if(eb) eb.style.display='none';
+  }
+}
+
+// ── IMEI ─────────────────────────────────────────────────────────────────────
+function luhn(n){
+  if(!/^\d{15}$/.test(n)) return false;
+  var s=0;
+  for(var i=0;i<15;i++){var d=parseInt(n[i]);if(i%2===1){d*=2;if(d>9)d-=9;}s+=d;}
+  return s%10===0;
+}
+
+function onImei(el){
+  el.value=el.value.replace(/\D/g,'');
+  var v=el.value;
+  var h=document.getElementById('imeiHint');
+  el.className='inp';
+  if(v.length===15){
+    if(luhn(v)){el.classList.add('inp-valid');h.textContent=' — ✓ Valid format';h.style.color='var(--green)';}
+    else{el.classList.add('inp-invalid');h.textContent=' — ✗ Invalid — red flag';h.style.color='var(--red)';}
+  } else {
+    h.textContent=' — '+v.length+'/15 digits';h.style.color='var(--text3)';
+  }
+}
+
+// ── PHOTO SLOTS ──────────────────────────────────────────────────────────────
+function onSlot(input,i){
+  var file=input.files&&input.files[0];
+  if(!file) return;
+  mimes[i]=file.type||'image/jpeg';
+  var slot=document.getElementById('slot'+i);
+  slot.classList.add('filled');
+  document.getElementById('slot'+i+'-empty').style.display='none';
+  document.getElementById('slot'+i+'-filled').style.display='flex';
+  document.getElementById('slot'+i+'-filled').style.flexDirection='column';
+  document.getElementById('slot'+i+'-filled').style.alignItems='center';
+  document.getElementById('slot'+i+'-img').src=URL.createObjectURL(file);
+  var reader=new FileReader();
+  reader.onloadend=function(){
+    var parts=reader.result&&reader.result.split(',');
+    photos[i]=parts&&parts[1]?parts[1]:null;
+    updateCounter();
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateCounter(){
+  var n=photos.filter(function(p){return p!==null;}).length;
+  var el=document.getElementById('photoCounter');
+  if(n===0){el.textContent='No photos — verification works without them too';el.style.color='var(--text3)';}
+  else if(n===1){el.textContent='1 photo added ✓ — add more for better accuracy';el.style.color='#4d9aff';}
+  else if(n===2){el.textContent='2 photos added ✓ — good! Add more if you have them';el.style.color='#4d9aff';}
+  else if(n===3){el.textContent='3 photos added ✓ — great accuracy';el.style.color='var(--green)';}
+  else{el.textContent='4 photos added ✓ — maximum accuracy';el.style.color='var(--green)';}
+}
+
+// ── ANIMATION ────────────────────────────────────────────────────────────────
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms);})}
+
+async function runAnim(){
+  for(var i=0;i<5;i++){
+    var el=document.getElementById('a'+i);
+    document.querySelectorAll('.anim-item').forEach(function(x){x.classList.remove('active');});
+    el.classList.add('active');
+    await sleep(900);
+    el.classList.remove('active');
+    el.classList.add('done');
+  }
+}
+
+// ── SCAN ─────────────────────────────────────────────────────────────────────
+async function startScan(){
+  var brand=document.getElementById('brand').value.trim();
+  var model=document.getElementById('model').value.trim();
+  var imei=document.getElementById('imei').value.trim();
+  var price=document.getElementById('price').value.trim();
+  var currency=document.getElementById('currency').value;
+  var notes=document.getElementById('notes').value.trim();
+
+  if(!brand||!model||!imei){
+    var eb=document.getElementById('errBox');
+    eb.textContent='⚠ Please fill in Brand, Model and IMEI to continue.';
+    eb.style.display='block';
+    return;
+  }
+
+  // Reset animation
+  for(var i=0;i<5;i++){
+    var ai=document.getElementById('a'+i);
+    ai.className='anim-item';
+  }
+
+  showPage('checking');
+
+  var validPhotos=photos.map(function(b,idx){return b?{b64:b,mime:mimes[idx]}:null;}).filter(Boolean);
+
+  var animP=runAnim();
+  var result=null;
+
+  try{
+    var resp=await fetch('/api/verify',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        brand:brand,model:model,imei:imei,
+        imeiOk:luhn(imei),
+        price:price,currency:currency,notes:notes,
+        photos:validPhotos
+      })
+    });
+
+    if(!resp.ok){
+      var errData=await resp.json().catch(function(){return {};});
+      throw new Error(errData&&errData.error&&errData.error.message?errData.error.message:'Error '+resp.status+' — please try again.');
+    }
+
+    var data=await resp.json();
+    if(data&&data.error) throw new Error(data.error.message||'AI returned an error.');
+    result=data;
+    if(!result||!result.verdict) throw new Error('Invalid response. Please try again.');
+
+  } catch(err){
+    await animP;
+    showPage('checker');
+    var eb=document.getElementById('errBox');
+    eb.textContent='⚠ '+(err.message||'Verification failed. Check your connection and try again.');
+    eb.style.display='block';
+    return;
+  }
+
+  await animP;
+  renderResult(result);
+  showPage('result');
+}
+
+// ── RENDER RESULT ─────────────────────────────────────────────────────────────
+function ph(v){
+  if(v===true) return '<span class="result-pass rpass">PASS ✓</span>';
+  if(v===false) return '<span class="result-pass rfail">FAIL ✗</span>';
+  return '<span class="result-pass rna">N/A</span>';
+}
+
+function renderResult(r){
+  var score=r.score||0;
+  var color,bg,border,label,icon;
+  if(score>=75){color='var(--green)';bg='rgba(0,230,118,.06)';border='rgba(0,230,118,.22)';label='GENUINE';icon='✅';}
+  else if(score>=45){color='var(--amber)';bg='rgba(255,179,0,.06)';border='rgba(255,179,0,.22)';label='SUSPICIOUS';icon='⚠️';}
+  else{color='var(--red)';bg='rgba(255,61,61,.06)';border='rgba(255,61,61,.22)';label='LIKELY FAKE';icon='🚫';}
+
+  var flags='';
+  var reds=r.red_flags||[];
+  var greens=r.green_flags||[];
+  if(reds.length||greens.length){
+    flags='<div class="flags-row">';
+    if(reds.length){
+      flags+='<div class="flag-card red"><div class="flag-card-title">🚩 RED FLAGS</div>';
+      reds.forEach(function(f){flags+='<div class="flag-item">• '+f+'</div>';});
+      flags+='</div>';
+    }
+    if(greens.length){
+      flags+='<div class="flag-card green"><div class="flag-card-title">✅ GOOD SIGNS</div>';
+      greens.forEach(function(f){flags+='<div class="flag-item">• '+f+'</div>';});
+      flags+='</div>';
+    }
+    flags+='</div>';
+  }
+
+  var physChecks='';
+  if(r.physical_checks&&r.physical_checks.length){
+    physChecks='<div class="check-list">';
+    r.physical_checks.forEach(function(c){physChecks+='<div class="check-list-item">'+c+'</div>';});
+    physChecks+='</div>';
+  }
+
+  document.getElementById('resultContent').innerHTML=`
+    <button class="page-back" type="button" onclick="showPage('home')">← Home</button>
+
+    <div class="verdict-block" style="background:${bg};border-color:${border};box-shadow:0 0 60px ${color}10">
+      <div class="verdict-tag" style="color:${color}">SimuScan Verification Result</div>
+      <div class="verdict-icon">${icon}</div>
+      <div class="verdict-name">${label}</div>
+      <div class="verdict-score" style="color:${color}">${score}<sub>/100</sub></div>
+      <div class="verdict-headline">${r.headline||''}</div>
+      <div class="verdict-conf" style="background:${color}18;color:${color}">Confidence: ${r.confidence||'MEDIUM'}</div>
+    </div>
+
+    <div class="result-section-title">Check Results</div>
+    ${r.imei_result?`<div class="result-row"><div class="result-row-header"><span class="result-row-name">IMEI Validation</span>${ph(r.imei_result.passed)}</div><div class="result-detail">${r.imei_result.detail||''}</div></div>`:''}
+    ${r.tac_result?`<div class="result-row"><div class="result-row-header"><span class="result-row-name">Brand / TAC Match</span>${ph(r.tac_result.passed)}</div><div class="result-detail">${r.tac_result.detail||''}</div></div>`:''}
+    ${r.model_result?`<div class="result-row"><div class="result-row-header"><span class="result-row-name">Model Verification</span>${ph(r.model_result.exists)}</div><div class="result-detail">${r.model_result.detail||''}</div></div>`:''}
+    ${r.price_result?`<div class="result-row"><div class="result-row-header"><span class="result-row-name">Price Reality Check</span>${ph(r.price_result.realistic)}</div><div class="result-detail">${r.price_result.detail||''}</div>${r.price_result.genuine_range_kes?`<div class="result-range">Kenya genuine price: <strong>${r.price_result.genuine_range_kes}</strong></div>`:''}</div>`:''}
+    ${r.visual_result?`<div class="result-row"><div class="result-row-header"><span class="result-row-name">Visual Inspection</span></div><div class="result-detail">${r.visual_result.detail||''}</div></div>`:''}
+
+    ${flags}
+
+    ${r.clone_warning?`<div class="warn-card warn-clone"><div class="warn-title">🚨 CLONE BRAND WARNING</div><div class="warn-body">${r.clone_warning_detail||''}</div></div>`:''}
+    ${r.storage_warning?`<div class="warn-card warn-storage"><div class="warn-title">⚠️ STORAGE FRAUD RISK</div><div class="warn-body">${r.storage_warning_detail||''}</div></div>`:''}
+
+    <div class="result-section-title">Advice</div>
+    <div class="advice-card" style="background:${bg};border:1px solid ${border}">
+      <div class="advice-title" style="color:${color}">Our Advice To You</div>
+      <div class="advice-body">${r.advice||''}</div>
+    </div>
+
+    ${r.service_centre?`<div class="advice-card" style="background:rgba(77,154,255,.05);border:1px solid rgba(77,154,255,.15)"><div class="advice-title" style="color:#4d9aff">For Official Confirmation</div><div class="advice-body" style="color:#7ab0e0">${r.service_centre}</div></div>`:''}
+
+    ${physChecks?`<div class="result-section-title">Check In The Shop Right Now</div>${physChecks}`:''}
+
+    <div class="result-disclaimer">ℹ️ SimuScan uses AI analysis. Results are advisory. For an official verdict, visit the brand's authorised service centre with the phone.</div>
+
+    ${r.certificate_note?`<div style="text-align:center;font-size:12px;color:var(--text3);font-style:italic;margin-bottom:14px">📄 ${r.certificate_note}</div>`:''}
+
+    <div class="result-actions">
+      <button class="btn-ghost" type="button" onclick="resetChecker()">Scan Another</button>
+      <button class="btn-verify" type="button" onclick="resetChecker()" style="font-size:14px;padding:14px">New Scan →</button>
+    </div>
+    <div class="result-footer">SimuScan · Made for Kenyans 🇰🇪</div>
+  `;
+}
+
+// ── RESET ─────────────────────────────────────────────────────────────────────
+function resetChecker(){
+  ['brand','model','imei','price','notes'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.value='';
+  });
+  var imeiEl=document.getElementById('imei');
+  if(imeiEl) imeiEl.className='inp';
+  var hint=document.getElementById('imeiHint');
+  if(hint){hint.textContent=' — 15 digits from *#06#';hint.style.color='';}
+  photos=[null,null,null,null];
+  for(var i=0;i<4;i++){
+    var slot=document.getElementById('slot'+i);
+    if(slot){
+      slot.classList.remove('filled');
+      var empty=document.getElementById('slot'+i+'-empty');
+      var filled=document.getElementById('slot'+i+'-filled');
+      var img=document.getElementById('slot'+i+'-img');
+      var finput=slot.querySelector('input[type=file]');
+      if(empty) empty.style.display='';
+      if(filled) filled.style.display='none';
+      if(img) img.src='';
+      if(finput) finput.value='';
+    }
+  }
+  updateCounter();
+  showPage('checker');
+}
+
+function sellerInterest(){
+  alert('Thank you for your interest! 🏅\n\nThe Trusted Seller programme is launching soon.\n\nTo be among the first verified sellers in Kenya, email:\ninfo@simuscan.co.ke\n\nWe will contact you directly.');
+}
+</script>
+</body>
+</html>
