@@ -838,21 +838,54 @@ async function startScan(){
 
   showPage('checking');
 
-  var validPhotos=photos.map(function(b,idx){return b?{b64:b,mime:mimes[idx]}:null;}).filter(Boolean);
+  // Compress photos to reduce payload size
+  async function compressPhoto(b64,mime){
+    return new Promise(function(resolve){
+      var img=new Image();
+      img.onload=function(){
+        var canvas=document.createElement('canvas');
+        var max=600;
+        var w=img.width,h=img.height;
+        if(w>max){h=Math.round(h*max/w);w=max;}
+        if(h>max){w=Math.round(w*max/h);h=max;}
+        canvas.width=w;canvas.height=h;
+        var ctx=canvas.getContext('2d');
+        ctx.drawImage(img,0,0,w,h);
+        var compressed=canvas.toDataURL('image/jpeg',0.6);
+        resolve({b64:compressed.split(',')[1],mime:'image/jpeg'});
+      };
+      img.onerror=function(){resolve(null);};
+      img.src='data:'+mime+';base64,'+b64;
+    });
+  }
+
+  var validPhotos=[];
+  for(var pi=0;pi<4;pi++){
+    if(photos[pi]){
+      var compressed=await compressPhoto(photos[pi],mimes[pi]);
+      if(compressed) validPhotos.push(compressed);
+    }
+  }
 
   var animP=runAnim();
   var result=null;
 
   try{
-    var resp=await fetch('/api/verify',{
+    var payload={
+      brand:brand,
+      model:model,
+      imei:imei,
+      imeiOk:luhn(imei),
+      price:price,
+      currency:currency,
+      notes:notes,
+      photos:validPhotos
+    };
+
+    var resp=await fetch('https://simucheck1.netlify.app/.netlify/functions/verify',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        brand:brand,model:model,imei:imei,
-        imeiOk:luhn(imei),
-        price:price,currency:currency,notes:notes,
-        photos:validPhotos
-      })
+      body:JSON.stringify(payload)
     });
 
     if(!resp.ok){
