@@ -1,48 +1,28 @@
 const https = require("https");
 
-exports.handler = async function(event) {
-  // CORS headers for all responses
-  const headers = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Content-Type": "application/json"
-  };
+export default async function handler(req, res) {
+  // CORS
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  // Handle preflight
-  if (event.httpMethod === "OPTIONS") {
-    return { statusCode: 200, headers, body: "" };
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
   }
 
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, headers, body: JSON.stringify({ error: { message: "Method not allowed" } }) };
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: { message: "Method not allowed" } });
   }
 
-  // Check API key
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: { message: "API key not configured in Netlify environment variables" } })
-    };
+    return res.status(500).json({ error: { message: "API key not configured. Add ANTHROPIC_API_KEY in Vercel environment variables." } });
   }
 
-  let payload;
-  try {
-    payload = JSON.parse(event.body);
-  } catch(e) {
-    return { statusCode: 400, headers, body: JSON.stringify({ error: { message: "Invalid request body" } }) };
-  }
-
-  const { brand, model, imei, imeiOk, price, currency, notes, photos } = payload;
+  const { brand, model, imei, imeiOk, price, currency, notes, photos } = req.body;
 
   if (!brand || !model || !imei) {
-    return {
-      statusCode: 400,
-      headers,
-      body: JSON.stringify({ error: { message: "Brand, model and IMEI are required" } })
-    };
+    return res.status(400).json({ error: { message: "Brand, model and IMEI are required." } });
   }
 
   const tac = imei.substring(0, 8);
@@ -51,9 +31,9 @@ exports.handler = async function(event) {
   // Build message content
   const userContent = [];
 
-  // Add photos
+  // Add photos if provided
   if (Array.isArray(photos)) {
-    photos.forEach(function(p) {
+    photos.forEach(p => {
       if (p && p.b64) {
         userContent.push({
           type: "image",
@@ -63,7 +43,6 @@ exports.handler = async function(event) {
     });
   }
 
-  // Add text prompt
   userContent.push({
     type: "text",
     text: `You are SimuScan, Kenya's most trusted phone verification AI.
@@ -79,57 +58,46 @@ Notes: ${notes || "none"}
 Photos uploaded: ${photoCount}
 
 KENYA PRICES 2025:
-Samsung A07: KES 10,000-16,000
-Samsung A15: KES 11,000-15,000
-Samsung A17: KES 13,000-17,000
-Samsung A25: KES 18,000-24,000
-Samsung A35: KES 26,000-34,000
-Samsung A55: KES 38,000-48,000
-Samsung S24: KES 95,000-120,000
-iPhone 13: KES 55,000-75,000
-iPhone 14: KES 75,000-95,000
-iPhone 15: KES 95,000-120,000
-Tecno Camon 40 Pro (genuine): KES 28,000-35,000
-Infinix Note 40 Pro: KES 24,000-30,000
-Redmi 15C: KES 12,000-16,000
-Redmi Note 13: KES 16,000-22,000
-Benco S1 Plus: KES 7,000-10,000
-Honor X8b: KES 16,000-22,000
-Nokia G42: KES 14,000-18,000
+Samsung A05: KES 8,000-11,000 | Samsung A06: KES 9,000-12,000 | Samsung A07: KES 10,000-16,000
+Samsung A15: KES 11,000-15,000 | Samsung A17: KES 13,000-17,000 | Samsung A25: KES 18,000-24,000
+Samsung A35: KES 26,000-34,000 | Samsung A55: KES 38,000-48,000 | Samsung S24: KES 95,000-120,000
+iPhone 13: KES 55,000-75,000 | iPhone 14: KES 75,000-95,000 | iPhone 15: KES 95,000-120,000
+Tecno Camon 40 Pro (genuine): KES 28,000-35,000 | Tecno Spark 30 Pro: KES 14,000-18,000
+Infinix Note 40 Pro: KES 24,000-30,000 | Infinix Hot 40: KES 12,000-16,000
+Redmi 15C: KES 12,000-16,000 | Redmi Note 13: KES 16,000-22,000
+Benco S1 Plus: KES 7,000-10,000 | Honor X8b: KES 16,000-22,000
+Nokia G42: KES 14,000-18,000 | Itel A70: KES 5,000-8,000
 
-REAL PHONES - DO NOT FLAG AS FAKE:
-Samsung Galaxy A17 (2024), Redmi 15C (2024), Benco S1 Plus, Honor phones, ZTE phones, Tecno/Infinix/Itel (Transsion)
+REAL PHONES - NEVER FLAG AS FAKE:
+Samsung Galaxy A17 (2024), Redmi 15C (2024), Benco S1 Plus, Honor phones, ZTE, Tecno, Infinix, Itel
 
 FAKE PATTERNS IN KENYA:
 - U-FM phones sold as Tecno Camon 40 Pro for under KES 15,000
 - iPhone under KES 40,000 = fake
 - Samsung S series under KES 40,000 = fake
-- IMEI Luhn fail = very likely fake
+- IMEI Luhn FAIL = very likely fake
 - Storage fraud: claims 256GB but only 8-16GB actual
+- TAC: Samsung 35xxxxxx, Apple 01/35xxxxxx, Transsion 86xxxxxx, Benco 86xxxxxx
 
-TAC CODES:
-Samsung: 35xxxxxx | Apple: 01xxxxxx or 35xxxxxx | Transsion: 86xxxxxx | Benco: 86xxxxxx
-
-SCORING: Start 85. Luhn fail -35. Model does not exist -50. TAC wrong brand -30. Price 40% below market -20. Visual fake signs -20. Clone brand in photo -30.
+SCORING: Start 85. Luhn fail -35. Model does not exist -50. TAC wrong brand -30. Price 40% below market -20. Visual fake -20. Clone brand in photo -30.
 GENUINE=75+, SUSPICIOUS=45-74, FAKE=below 45
 
-${photoCount > 0 ? "Analyse all uploaded photos carefully for logo, box design, specs, build quality, clone brand names." : "No photos provided."}
+${photoCount > 0 ? "Analyse ALL uploaded photos for logo, box design, specs, build quality, clone brand names." : "No photos provided."}
 
-Reply ONLY with this JSON, nothing else:
-{"score":85,"verdict":"GENUINE","headline":"This phone appears to be genuine based on all checks.","confidence":"HIGH","imei_result":{"passed":true,"detail":"The IMEI passes the Luhn algorithm check and the format is valid."},"tac_result":{"passed":true,"detail":"TAC code matches the claimed brand."},"model_result":{"exists":true,"detail":"This model exists and is sold in Kenya."},"price_result":{"realistic":true,"genuine_range_kes":"KES 7,000-10,000","detail":"Price is within the expected range for this model."},"visual_result":{"detail":"No photo provided. Upload photos next time for better accuracy."},"storage_warning":false,"storage_warning_detail":"","clone_warning":false,"clone_warning_detail":"","red_flags":[],"green_flags":["IMEI passes Luhn check","Model exists","Price realistic"],"physical_checks":["Dial *#06# and confirm IMEI matches box sticker","Check storage by copying a large file","Verify brand logo font and spacing"],"advice":"Based on the information provided, this phone shows no major red flags. Always verify physically in the shop before paying.","service_centre":"Visit Vmobile Kenya (Benco authorised dealer) in Nairobi for official confirmation.","certificate_note":"This SimuScan result can be shown to the seller if a dispute arises."}`
+Reply ONLY with this exact JSON, nothing else, no markdown:
+{"score":85,"verdict":"GENUINE","headline":"This phone appears genuine based on all checks.","confidence":"HIGH","imei_result":{"passed":true,"detail":"IMEI passes Luhn algorithm check. Format is valid."},"tac_result":{"passed":true,"detail":"TAC code is consistent with the claimed brand."},"model_result":{"exists":true,"detail":"This model exists and is sold in Kenya."},"price_result":{"realistic":true,"genuine_range_kes":"KES 7,000-10,000","detail":"Price is within expected range for this model in Kenya."},"visual_result":{"detail":"No photo provided. Upload photos next time for better accuracy."},"storage_warning":false,"storage_warning_detail":"","clone_warning":false,"clone_warning_detail":"","red_flags":[],"green_flags":["IMEI passes Luhn check","Model is legitimate","Price is realistic"],"physical_checks":["Dial *#06# and confirm IMEI matches the box sticker","Copy a large file to test actual storage capacity","Check brand logo font and spacing carefully"],"advice":"Based on all checks this phone shows no major red flags. Always verify physically before paying.","service_centre":"Visit the brand authorised service centre in Nairobi for official confirmation.","certificate_note":"This SimuScan result can be shown to the seller if a dispute arises."}`
   });
 
-  // Call Anthropic API
   const requestBody = JSON.stringify({
     model: "claude-sonnet-4-20250514",
     max_tokens: 1200,
-    system: "You are SimuScan — Kenya's phone authentication AI. Be accurate and honest. Respond ONLY with the pure JSON object shown in the prompt — no markdown, no backticks, no extra text.",
+    system: "You are SimuScan — Kenya's phone authentication AI. Be accurate and honest. Respond ONLY with the pure JSON object — no markdown, no backticks, no extra text whatsoever.",
     messages: [{ role: "user", content: userContent }]
   });
 
   try {
     const result = await new Promise((resolve, reject) => {
-      const req = https.request({
+      const reqOptions = {
         hostname: "api.anthropic.com",
         path: "/v1/messages",
         method: "POST",
@@ -139,41 +107,41 @@ Reply ONLY with this JSON, nothing else:
           "anthropic-version": "2023-06-01",
           "Content-Length": Buffer.byteLength(requestBody)
         }
-      }, (res) => {
+      };
+
+      const apiReq = https.request(reqOptions, apiRes => {
         let data = "";
-        res.on("data", chunk => { data += chunk; });
-        res.on("end", () => {
-          try { resolve({ status: res.statusCode, body: JSON.parse(data) }); }
+        apiRes.on("data", chunk => { data += chunk; });
+        apiRes.on("end", () => {
+          try { resolve({ status: apiRes.statusCode, body: JSON.parse(data) }); }
           catch(e) { reject(new Error("Failed to parse API response")); }
         });
       });
-      req.on("error", reject);
-      req.setTimeout(25000, () => { req.destroy(); reject(new Error("Request timed out — please try again")); });
-      req.write(requestBody);
-      req.end();
+
+      apiReq.on("error", reject);
+      apiReq.setTimeout(25000, () => {
+        apiReq.destroy();
+        reject(new Error("Request timed out — please try again"));
+      });
+      apiReq.write(requestBody);
+      apiReq.end();
     });
 
     if (result.status !== 200) {
       const msg = result.body?.error?.message || "API error " + result.status;
-      return { statusCode: 500, headers, body: JSON.stringify({ error: { message: msg } }) };
+      return res.status(500).json({ error: { message: msg } });
     }
 
     const textBlock = result.body.content && result.body.content.find(b => b.type === "text");
     if (!textBlock || !textBlock.text) {
-      return { statusCode: 500, headers, body: JSON.stringify({ error: { message: "No response from AI. Please try again." } }) };
+      return res.status(500).json({ error: { message: "No response from AI. Please try again." } });
     }
 
-    // Parse the JSON verdict
     const cleaned = textBlock.text.replace(/```json\s*/gi, "").replace(/```\s*/gi, "").trim();
     const verdict = JSON.parse(cleaned);
-
-    return { statusCode: 200, headers, body: JSON.stringify(verdict) };
+    return res.status(200).json(verdict);
 
   } catch(err) {
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: { message: err.message || "Verification failed. Please try again." } })
-    };
+    return res.status(500).json({ error: { message: err.message || "Verification failed. Please try again." } });
   }
-};
+}
