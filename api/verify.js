@@ -89,7 +89,7 @@ Reply ONLY with this exact JSON, nothing else, no markdown:
   });
 
   const requestBody = JSON.stringify({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-haiku-4-5-20251001",
     max_tokens: 1200,
     system: "You are SimuScan — Kenya's phone authentication AI. Be accurate and honest. Respond ONLY with the pure JSON object — no markdown, no backticks, no extra text whatsoever.",
     messages: [{ role: "user", content: userContent }]
