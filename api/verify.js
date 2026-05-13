@@ -177,4 +177,3 @@ Reply ONLY with this JSON, nothing else:
     };
   }
 };
-  
