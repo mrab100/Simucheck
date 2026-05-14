@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SimuScan Admin</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#04080f;color:#f0f0f0;font-family:system-ui,sans-serif;min-height:100vh}
+.login{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-card{background:#111;border:1px solid #222;border-radius:12px;padding:32px 28px;width:100%;max-width:360px;text-align:center}
+.login-logo{font-size:32px;margin-bottom:12px}
+.login-title{font-size:22px;font-weight:800;margin-bottom:6px;letter-spacing:.04em}
+.login-sub{font-size:13px;color:#555;margin-bottom:24px}
+.login-input{width:100%;background:#0a0a0a;border:1px solid #222;border-radius:8px;padding:14px;color:#f0f0f0;font-size:15px;outline:none;margin-bottom:12px;text-align:center;letter-spacing:.1em}
+.login-btn{width:100%;background:#00e676;color:#000;border:none;border-radius:8px;padding:14px;font-size:15px;font-weight:700;cursor:pointer}
+.login-err{font-size:13px;color:#ff5555;margin-top:8px;display:none}
+.dash{display:none;padding:0 0 60px}
+.dash-nav{background:#000;border-bottom:1px solid #1a1a1a;padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.dash-logo{display:flex;align-items:center;gap:8px}
+.dash-logo-icon{width:28px;height:28px;background:#00e676;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#000;font-weight:900}
+.dash-logo-text{font-size:16px;font-weight:800;letter-spacing:.05em}
+.dash-logo-sub{font-size:9px;color:#00e676;letter-spacing:.15em;text-transform:uppercase;margin-top:-2px}
+.dash-logout{background:transparent;border:1px solid #333;color:#666;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer}
+.dash-inner{max-width:600px;margin:0 auto;padding:20px 16px}
+.dash-header{margin-bottom:20px}
+.dash-date{font-size:11px;color:#444;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.dash-title{font-size:22px;font-weight:800}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.stat-card{background:#111;border:1px solid #1a1a1a;border-radius:10px;padding:16px}
+.stat-card.green{border-color:rgba(0,230,118,.2);background:rgba(0,230,118,.05)}
+.stat-num{font-size:32px;font-weight:900;line-height:1}
+.stat-card.green .stat-num{color:#00e676}
+.stat-label{font-size:11px;color:#555;margin-top:4px;text-transform:uppercase;letter-spacing:.08em}
+.verdict-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+.vcard{background:#111;border:1px solid #1a1a1a;border-radius:10px;padding:14px;text-align:center}
+.vcard.genuine{border-color:rgba(0,230,118,.2)}
+.vcard.suspicious{border-color:rgba(255,179,0,.2)}
+.vcard.fake{border-color:rgba(255,61,61,.2)}
+.vcard-num{font-size:26px;font-weight:900}
+.vcard.genuine .vcard-num{color:#00e676}
+.vcard.suspicious .vcard-num{color:#ffb300}
+.vcard.fake .vcard-num{color:#ff3d3d}
+.vcard-label{font-size:10px;color:#555;margin-top:3px;text-transform:uppercase;letter-spacing:.08em}
+.section-title{font-size:10px;color:#444;letter-spacing:.18em;text-transform:uppercase;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.section-title::before{content:'';flex:1;height:1px;background:#1a1a1a}
+.brands-list{display:flex;flex-direction:column;gap:6px;margin-bottom:20px}
+.brand-row{display:flex;align-items:center;gap:10px;background:#111;border:1px solid #1a1a1a;border-radius:8px;padding:10px 14px}
+.brand-name{font-size:13px;font-weight:600;flex:1}
+.brand-bar-wrap{flex:2;background:#0a0a0a;border-radius:100px;height:6px;overflow:hidden}
+.brand-bar{background:#00e676;height:100%;border-radius:100px;transition:width .5s}
+.brand-count{font-size:12px;color:#555;flex-shrink:0;font-weight:700}
+.recent-list{display:flex;flex-direction:column;gap:8px}
+.recent-item{background:#111;border:1px solid #1a1a1a;border-radius:8px;padding:12px 14px}
+.recent-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.recent-phone{font-size:13px;font-weight:700;color:#f0f0f0}
+.recent-badge{font-size:10px;font-weight:800;padding:2px 8px;border-radius:4px;letter-spacing:.06em}
+.badge-genuine{background:rgba(0,230,118,.15);color:#00e676}
+.badge-suspicious{background:rgba(255,179,0,.12);color:#ffb300}
+.badge-fake{background:rgba(255,61,61,.12);color:#ff3d3d}
+.recent-meta{font-size:11px;color:#444;display:flex;gap:10px}
+.loading{text-align:center;padding:40px;color:#333;font-size:14px}
+.refresh-btn{background:transparent;border:1px solid #333;color:#666;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;float:right}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login" id="loginWrap">
+  <div class="login-card">
+    <div class="login-logo">🛡️</div>
+    <div class="login-title">SIMUSCAN</div>
+    <div class="login-sub">Admin Dashboard — Authorized Access Only</div>
+    <input type="password" class="login-input" id="pwInput" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="login-btn" onclick="doLogin()">Access Dashboard</button>
+    <div class="login-err" id="loginErr">Wrong password. Try again.</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dash" id="dashboard">
+  <nav class="dash-nav">
+    <div class="dash-logo">
+      <div class="dash-logo-icon">S</div>
+      <div>
+        <div class="dash-logo-text">SIMUSCAN</div>
+        <div class="dash-logo-sub">Admin Dashboard</div>
+      </div>
+    </div>
+    <button class="dash-logout" onclick="logout()">Logout</button>
+  </nav>
+
+  <div class="dash-inner">
+    <div id="dashContent" class="loading">Loading stats...</div>
+  </div>
+</div>
+
+<script>
+var pw = '';
+
+function doLogin(){
+  pw = document.getElementById('pwInput').value.trim();
+  if(!pw){ document.getElementById('loginErr').style.display='block'; return; }
+  document.getElementById('loginErr').style.display='none';
+  loadDash();
+}
+
+function logout(){
+  pw='';
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('loginWrap').style.display='flex';
+  document.getElementById('pwInput').value='';
+}
+
+async function loadDash(){
+  try{
+    var resp = await fetch('/api/stats', {
+      headers: { 'x-admin-key': pw }
+    });
+    if(resp.status===401){
+      document.getElementById('loginErr').textContent='Wrong password.';
+      document.getElementById('loginErr').style.display='block';
+      return;
+    }
+    var data = await resp.json();
+    if(data.error){
+      document.getElementById('dashContent').innerHTML='<div style="color:#ff5555;text-align:center;padding:40px">'+data.error+'</div>';
+    } else {
+      renderDash(data);
+    }
+    document.getElementById('loginWrap').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+  }catch(err){
+    document.getElementById('loginErr').textContent='Connection error: '+err.message;
+    document.getElementById('loginErr').style.display='block';
+  }
+}
+
+function renderDash(d){
+  var now = new Date();
+  var maxBrand = d.top_brands && d.top_brands.length ? d.top_brands[0].count : 1;
+
+  var brandsHtml = '';
+  if(d.top_brands && d.top_brands.length){
+    d.top_brands.forEach(function(b){
+      var pct = Math.round((b.count/maxBrand)*100);
+      brandsHtml += `<div class="brand-row">
+        <div class="brand-name">${b.brand}</div>
+        <div class="brand-bar-wrap"><div class="brand-bar" style="width:${pct}%"></div></div>
+        <div class="brand-count">${b.count}</div>
+      </div>`;
+    });
+  } else {
+    brandsHtml = '<div style="color:#333;font-size:13px;text-align:center;padding:16px">No data yet</div>';
+  }
+
+  var recentHtml = '';
+  if(d.recent && d.recent.length){
+    d.recent.forEach(function(v){
+      var badgeClass = v.verdict==='GENUINE'?'badge-genuine':v.verdict==='SUSPICIOUS'?'badge-suspicious':'badge-fake';
+      var time = new Date(v.created_at);
+      var timeStr = time.toLocaleDateString('en-KE',{month:'short',day:'numeric'}) + ' ' + time.toLocaleTimeString('en-KE',{hour:'2-digit',minute:'2-digit'});
+      recentHtml += `<div class="recent-item">
+        <div class="recent-header">
+          <div class="recent-phone">${v.brand} ${v.model}</div>
+          <div class="recent-badge ${badgeClass}">${v.verdict}</div>
+        </div>
+        <div class="recent-meta">
+          <span>Score: ${v.score}/100</span>
+          <span>${v.has_photo ? '📷 Photo' : 'No photo'}</span>
+          <span>${timeStr}</span>
+        </div>
+      </div>`;
+    });
+  } else {
+    recentHtml = '<div style="color:#333;font-size:13px;text-align:center;padding:16px">No verifications yet</div>';
+  }
+
+  var total = d.total || 0;
+  var fakeRate = total > 0 ? Math.round(((d.fake||0)/total)*100) : 0;
+
+  document.getElementById('dashContent').innerHTML = `
+    <div class="dash-header">
+      <div class="dash-date">${now.toLocaleDateString('en-KE',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div>
+      <div class="dash-title">Dashboard <button class="refresh-btn" onclick="loadDash()">↻ Refresh</button></div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card green">
+        <div class="stat-num">${d.today||0}</div>
+        <div class="stat-label">Verifications Today</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">${d.yesterday||0}</div>
+        <div class="stat-label">Yesterday</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">${total.toLocaleString()}</div>
+        <div class="stat-label">Total All Time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color:${fakeRate>30?'#ff3d3d':fakeRate>15?'#ffb300':'#00e676'}">${fakeRate}%</div>
+        <div class="stat-label">Fake Phone Rate</div>
+      </div>
+    </div>
+
+    <div class="verdict-row">
+      <div class="vcard genuine"><div class="vcard-num">${d.genuine||0}</div><div class="vcard-label">Genuine</div></div>
+      <div class="vcard suspicious"><div class="vcard-num">${d.suspicious||0}</div><div class="vcard-label">Suspicious</div></div>
+      <div class="vcard fake"><div class="vcard-num">${d.fake||0}</div><div class="vcard-label">Fake</div></div>
+    </div>
+
+    <div class="section-title">Top Brands Checked</div>
+    <div class="brands-list">${brandsHtml}</div>
+
+    <div class="section-title">Recent Verifications</div>
+    <div class="recent-list">${recentHtml}</div>
+  `;
+}
+</script>
+</body>
+</html>
