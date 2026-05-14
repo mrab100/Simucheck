@@ -224,21 +224,6 @@ Reply ONLY with this exact JSON — no markdown, no backticks:
 
     const cleaned = textBlock.text.replace(/```json\s*/gi, "").replace(/```\s*/gi, "").trim();
     const verdict = JSON.parse(cleaned);
-
-    // Log this verification to stats (fire and forget — don't wait)
-    try {
-      const statsBody = JSON.stringify({
-        brand, model,
-        verdict: verdict.verdict,
-        score: verdict.score
-      });
-      post("api.jsonbin.io", `/v3/b/${process.env.JSONBIN_ID}`, {
-        "Content-Type": "application/json",
-        "X-Access-Key": process.env.JSONBIN_KEY,
-        "Content-Length": Buffer.byteLength(statsBody)
-      }, statsBody).catch(() => {}); // silent fail
-    } catch(e) {}
-
     return res.status(200).json(verdict);
 
   } catch(err) {
