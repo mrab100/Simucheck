@@ -62,10 +62,10 @@ nav{
 
 /* HERO */
 .hero{
+  padding:24px 24px 40px;
+  position:relative;overflow:hidden;
   min-height:calc(100vh - 56px);
   display:flex;flex-direction:column;justify-content:center;
-  padding:60px 24px 40px;
-  position:relative;overflow:hidden;
 }
 .hero-bg{
   position:absolute;inset:0;
@@ -474,9 +474,59 @@ textarea.inp{resize:none;line-height:1.5}
   .result-actions{grid-template-columns:1fr}
   .photo-grid{grid-template-columns:1fr 1fr}
 }
+/* SHARE CARD */
+.share-overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto}
+.share-overlay.active{display:flex;flex-direction:column;gap:12px;align-items:center}
+.share-card{background:#0a0a0a;border-radius:16px;padding:24px 20px;width:100%;max-width:340px;text-align:center;border:1px solid #1a1a1a;flex-shrink:0}
+.sc-logo{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid #111}
+.sc-logo-icon{width:24px;height:24px;background:#00e676;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#000;font-weight:900}
+.sc-logo-name{font-size:15px;font-weight:800;letter-spacing:.06em;color:#fff}
+.sc-logo-tag{font-size:8px;color:#00e676;letter-spacing:.15em;text-transform:uppercase;margin-top:-2px}
+.sc-icon{font-size:38px;margin-bottom:6px}
+.sc-label{font-size:26px;font-weight:900;letter-spacing:.04em;margin-bottom:4px}
+.sc-score{font-size:52px;font-weight:900;line-height:1;margin:6px 0}
+.sc-phone{font-size:13px;color:#666;margin-bottom:12px}
+.sc-checks{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:10px 0 14px}
+.sc-check{font-size:10px;padding:3px 9px;border-radius:100px;font-weight:700}
+.sc-pass{background:rgba(0,230,118,.12);color:#00e676;border:1px solid rgba(0,230,118,.25)}
+.sc-fail{background:rgba(255,61,61,.12);color:#ff3d3d;border:1px solid rgba(255,61,61,.2)}
+.sc-url{font-size:11px;color:#333;margin-top:12px;letter-spacing:.06em}
+.sc-tagline{font-size:10px;color:#2a2a2a;margin-top:3px}
+.share-actions{display:flex;flex-direction:column;gap:8px;width:100%;max-width:340px}
+.share-btn-dl{background:#00e676;color:#000;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:system-ui,sans-serif;width:100%;letter-spacing:.03em}
+.share-btn-wp{background:#25d366;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:system-ui,sans-serif;width:100%}
+.share-btn-close{background:transparent;border:1px solid #222;color:#555;border-radius:10px;padding:11px;font-size:13px;cursor:pointer;font-family:system-ui,sans-serif;width:100%}
+.share-tip{font-size:11px;color:#333;text-align:center;max-width:340px;line-height:1.5}
 </style>
 </head>
 <body>
+
+<!-- SHARE CARD MODAL -->
+<div class="share-overlay" id="shareOverlay">
+  <div class="share-card" id="shareCard">
+    <div class="sc-logo">
+      <div class="sc-logo-icon">S</div>
+      <div>
+        <div class="sc-logo-name">SIMUSCAN</div>
+        <div class="sc-logo-tag">Kenya Phone Verifier</div>
+      </div>
+    </div>
+    <div class="sc-icon" id="scIcon">✅</div>
+    <div class="sc-label" id="scLabel" style="color:#00e676">GENUINE</div>
+    <div class="sc-score" id="scScore" style="color:#00e676">85<span style="font-size:18px;color:#333">/100</span></div>
+    <div class="sc-phone" id="scPhone">Samsung Galaxy A06</div>
+    <div class="sc-checks" id="scChecks"></div>
+    <div id="scHeadline" style="font-size:13px;color:#555;line-height:1.5;margin-bottom:6px"></div>
+    <div class="sc-url">simucheck.vercel.app</div>
+    <div class="sc-tagline">Verify your phone before you pay 🇰🇪</div>
+  </div>
+  <div class="share-actions">
+    <button class="share-btn-dl" onclick="downloadCard()">📸 Save as Image</button>
+    <button class="share-btn-wp" onclick="shareWhatsApp()">💬 Share on WhatsApp</button>
+    <button class="share-btn-close" onclick="closeShare()">✕ Close</button>
+  </div>
+  <div class="share-tip">📌 Save the image then post it on TikTok, Instagram or WhatsApp Status to warn your friends about fake phones</div>
+</div>
 
 <!-- NAV -->
 <nav>
@@ -603,7 +653,10 @@ textarea.inp{resize:none;line-height:1.5}
             <div class="price-tier-price">KES 999<span style="font-size:12px;color:var(--text3)">/mo</span></div>
           </div>
         </div>
-        <button class="btn-seller" type="button" onclick="sellerInterest()">Join the Waiting List →</button>
+        <button class="btn-seller" type="button" onclick="window.open('https://wa.me/254793592174?text=Hi%20SimuScan%20%F0%9F%91%8B%0A%0AI%20want%20the%20Trusted%20Seller%20badge%20for%20my%20phone%20shop.%0A%0AMy%20shop%20name%3A%20%5BYour%20Shop%20Name%5D%0ALocation%3A%20%5BYour%20Location%5D%0A%0APlease%20contact%20me%20about%20the%20seller%20programme.','_blank')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;margin-right:6px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp Us Now →
+        </button>
         <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:8px">Pay via M-Pesa · Launching soon · Be first</div>
       </div>
     </div>
@@ -642,10 +695,9 @@ textarea.inp{resize:none;line-height:1.5}
         <option>Honor</option><option>Oppo</option><option>Vivo</option>
         <option>Realme</option><option>OnePlus</option><option>Google Pixel</option>
         <option>Nokia</option><option>Motorola</option><option>Sony</option>
-        <option>ZTE</option><option>Benco</option><option>Gionee</option>
-        <option>Oukitel</option><option>Cubot</option><option>Doogee</option>
-        <option>Umidigi</option><option>Blackview</option><option>Atel</option>
-        <option>HTC</option><option>Other</option>
+        <option>ZTE</option><option>Benco</option><option>Nothing</option>
+        <option>Neon (Safaricom)</option><option>Umidigi</option><option>Blackview</option>
+        <option>Other</option>
       </select>
     </div>
 
@@ -838,21 +890,54 @@ async function startScan(){
 
   showPage('checking');
 
-  var validPhotos=photos.map(function(b,idx){return b?{b64:b,mime:mimes[idx]}:null;}).filter(Boolean);
+  // Compress photos to reduce payload size
+  async function compressPhoto(b64,mime){
+    return new Promise(function(resolve){
+      var img=new Image();
+      img.onload=function(){
+        var canvas=document.createElement('canvas');
+        var max=400; // reduced from 600 to fix 413 payload too large
+        var w=img.width,h=img.height;
+        if(w>max){h=Math.round(h*max/w);w=max;}
+        if(h>max){w=Math.round(w*max/h);h=max;}
+        canvas.width=w;canvas.height=h;
+        var ctx=canvas.getContext('2d');
+        ctx.drawImage(img,0,0,w,h);
+        var compressed=canvas.toDataURL('image/jpeg',0.4); // reduced from 0.6
+        resolve({b64:compressed.split(',')[1],mime:'image/jpeg'});
+      };
+      img.onerror=function(){resolve(null);};
+      img.src='data:'+mime+';base64,'+b64;
+    });
+  }
+
+  var validPhotos=[];
+  for(var pi=0;pi<4;pi++){
+    if(photos[pi]){
+      var compressed=await compressPhoto(photos[pi],mimes[pi]);
+      if(compressed) validPhotos.push(compressed);
+    }
+  }
 
   var animP=runAnim();
   var result=null;
 
   try{
+    var payload={
+      brand:brand,
+      model:model,
+      imei:imei,
+      imeiOk:luhn(imei),
+      price:price,
+      currency:currency,
+      notes:notes,
+      photos:validPhotos
+    };
+
     var resp=await fetch('/api/verify',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        brand:brand,model:model,imei:imei,
-        imeiOk:luhn(imei),
-        price:price,currency:currency,notes:notes,
-        photos:validPhotos
-      })
+      body:JSON.stringify(payload)
     });
 
     if(!resp.ok){
@@ -869,7 +954,11 @@ async function startScan(){
     await animP;
     showPage('checker');
     var eb=document.getElementById('errBox');
-    eb.textContent='⚠ '+(err.message||'Verification failed. Check your connection and try again.');
+    var msg=err.message||'Verification failed.';
+    if(msg.includes('404')||msg.includes('fetch')){
+      msg='Function not found (404). Go to Netlify → Functions tab and check if "verify" is listed. If not, reconnect your GitHub repo.';
+    }
+    eb.textContent='⚠ '+msg;
     eb.style.display='block';
     return;
   }
@@ -958,10 +1047,20 @@ function renderResult(r){
 
     <div class="result-actions">
       <button class="btn-ghost" type="button" onclick="resetChecker()">Scan Another</button>
-      <button class="btn-verify" type="button" onclick="resetChecker()" style="font-size:14px;padding:14px">New Scan →</button>
+      <button class="btn-verify" type="button" onclick="showShareCard()" style="font-size:14px;padding:14px">📤 Share Result</button>
+    </div>
+    <div style="text-align:center;margin-top:10px">
+      <button class="btn-ghost" type="button" onclick="resetChecker()" style="width:100%;font-size:13px">← New Scan</button>
     </div>
     <div class="result-footer">SimuScan · Made for Kenyans 🇰🇪</div>
   `;
+
+  // Store result for share card
+  window._lastResult = r;
+  window._lastColor = color;
+  window._lastLabel = label;
+  window._lastIcon = icon;
+  window._lastScore = score;
 }
 
 // ── RESET ─────────────────────────────────────────────────────────────────────
@@ -993,7 +1092,170 @@ function resetChecker(){
 }
 
 function sellerInterest(){
-  alert('Thank you for your interest! 🏅\n\nThe Trusted Seller programme is launching soon.\n\nTo be among the first verified sellers in Kenya, email:\ninfo@simuscan.co.ke\n\nWe will contact you directly.');
+  window.open('https://wa.me/254793592174?text=Habari%20SimuScan%20%F0%9F%91%8B%0A%0ANataka%20Trusted%20Seller%20badge%20kwa%20duka%20langu.','_blank');
+}
+
+// ── SHARE CARD ────────────────────────────────────────────────────────────────
+function showShareCard(){
+  var r=window._lastResult;
+  if(!r) return;
+
+  var score=r.score||0;
+  var verdict=r.verdict||'UNKNOWN';
+  var brand=document.getElementById('brand')?document.getElementById('brand').value:'';
+  var model=document.getElementById('model')?document.getElementById('model').value:'';
+
+  var color, bg, emoji, tagline;
+  if(score>=75){
+    color='#00e676'; bg='#0a1f0f'; emoji='✅';
+    tagline='This phone is GENUINE';
+  } else if(score>=45){
+    color='#ffb300'; bg='#1a1500'; emoji='⚠️';
+    tagline='This phone is SUSPICIOUS';
+  } else {
+    color='#ff3d3d'; bg='#1a0505'; emoji='🚫';
+    tagline='This phone is LIKELY FAKE';
+  }
+
+  // Create canvas for the share image
+  var canvas=document.createElement('canvas');
+  canvas.width=1080; canvas.height=1080;
+  var ctx=canvas.getContext('2d');
+
+  // Background
+  ctx.fillStyle='#000000';
+  ctx.fillRect(0,0,1080,1080);
+
+  // Colored top bar
+  ctx.fillStyle=color;
+  ctx.fillRect(0,0,1080,12);
+
+  // Bottom bar
+  ctx.fillStyle=color;
+  ctx.fillRect(0,1068,1080,12);
+
+  // Score circle
+  ctx.beginPath();
+  ctx.arc(540,300,180,0,Math.PI*2);
+  ctx.fillStyle=bg;
+  ctx.fill();
+  ctx.strokeStyle=color;
+  ctx.lineWidth=8;
+  ctx.stroke();
+
+  // Score number
+  ctx.fillStyle=color;
+  ctx.font='bold 140px system-ui,sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText(score,540,355);
+
+  // /100
+  ctx.fillStyle='#444';
+  ctx.font='36px system-ui,sans-serif';
+  ctx.fillText('/100',540,400);
+
+  // Verdict
+  ctx.fillStyle='#ffffff';
+  ctx.font='bold 72px system-ui,sans-serif';
+  ctx.fillText(verdict,540,530);
+
+  // Phone name
+  ctx.fillStyle='#888888';
+  ctx.font='38px system-ui,sans-serif';
+  var phoneName=(brand+' '+model).trim();
+  if(phoneName.length>24) phoneName=phoneName.substring(0,24)+'...';
+  ctx.fillText(phoneName,540,600);
+
+  // Tagline
+  ctx.fillStyle=color;
+  ctx.font='bold 40px system-ui,sans-serif';
+  ctx.fillText(tagline,540,680);
+
+  // Divider
+  ctx.strokeStyle='#222';
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(100,720);
+  ctx.lineTo(980,720);
+  ctx.stroke();
+
+  // SimuScan branding
+  // Logo circle
+  ctx.fillStyle=color;
+  ctx.beginPath();
+  ctx.roundRect(390,760,60,60,12);
+  ctx.fill();
+  ctx.fillStyle='#000';
+  ctx.font='bold 36px system-ui,sans-serif';
+  ctx.fillText('S',420,800);
+
+  // Brand name
+  ctx.fillStyle='#ffffff';
+  ctx.font='bold 52px system-ui,sans-serif';
+  ctx.fillText('SIMUSCAN',540,870);
+
+  ctx.fillStyle='#555';
+  ctx.font='30px system-ui,sans-serif';
+  ctx.fillText('Kenya Phone Verifier · simucheck.vercel.app',540,920);
+
+  ctx.fillStyle='#333';
+  ctx.font='26px system-ui,sans-serif';
+  ctx.fillText('Verify yours free before you pay 🇰🇪',540,970);
+
+  // Convert to image
+  var dataUrl=canvas.toDataURL('image/png');
+
+  // Show modal
+  var modal=document.createElement('div');
+  modal.id='shareModal';
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;';
+
+  var img=document.createElement('img');
+  img.src=dataUrl;
+  img.style.cssText='max-width:100%;max-height:55vh;border-radius:12px;margin-bottom:16px;';
+
+  var title=document.createElement('div');
+  title.style.cssText='color:#fff;font-size:16px;font-weight:700;margin-bottom:6px;text-align:center;';
+  title.textContent='📤 Share Your Result';
+
+  var sub=document.createElement('div');
+  sub.style.cssText='color:#555;font-size:13px;margin-bottom:20px;text-align:center;';
+  sub.textContent='Screenshot this or tap to download · Share on WhatsApp, TikTok, Instagram';
+
+  var btnRow=document.createElement('div');
+  btnRow.style.cssText='display:flex;gap:10px;width:100%;max-width:400px;';
+
+  var dlBtn=document.createElement('button');
+  dlBtn.style.cssText='flex:1;background:#00e676;color:#000;border:none;border-radius:8px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;';
+  dlBtn.textContent='⬇ Download Image';
+  dlBtn.onclick=function(){
+    var a=document.createElement('a');
+    a.href=dataUrl;
+    a.download='simuscan-result-'+verdict.toLowerCase()+'.png';
+    a.click();
+  };
+
+  var waBtn=document.createElement('button');
+  waBtn.style.cssText='flex:1;background:#25d366;color:#fff;border:none;border-radius:8px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;';
+  waBtn.textContent='💬 WhatsApp';
+  waBtn.onclick=function(){
+    var text='I just verified my '+phoneName+' on SimuScan%21%0A%0AResult%3A *'+verdict+'* ('+score+'%2F100)%0A%0ACheck yours free%3A simucheck.vercel.app%0A%0A%F0%9F%87%B0%F0%9F%87%AA Made for Kenyans';
+    window.open('https://wa.me/?text='+text,'_blank');
+  };
+
+  var closeBtn=document.createElement('button');
+  closeBtn.style.cssText='position:absolute;top:20px;right:20px;background:transparent;border:1px solid #333;color:#888;border-radius:6px;padding:6px 14px;font-size:13px;cursor:pointer;';
+  closeBtn.textContent='✕ Close';
+  closeBtn.onclick=function(){document.getElementById('shareModal').remove();};
+
+  btnRow.appendChild(dlBtn);
+  btnRow.appendChild(waBtn);
+  modal.appendChild(closeBtn);
+  modal.appendChild(img);
+  modal.appendChild(title);
+  modal.appendChild(sub);
+  modal.appendChild(btnRow);
+  document.body.appendChild(modal);
 }
 </script>
 </body>
